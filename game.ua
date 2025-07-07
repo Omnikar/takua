@@ -138,23 +138,23 @@ Cap  ← 3
   )
 └─╴
 
-Board 5
+# Board 5
 
-⍜(°□ ⊡1_2 Board~State|⋅[Cap Flat ¯Flat])
-⍜(°□ ⊡3_2 Board~State|⋅[¯Wall])
+# ⍜(°□ ⊡1_2 Board~State|⋅[Cap Flat ¯Flat])
+# ⍜(°□ ⊡3_2 Board~State|⋅[¯Wall])
 
-Move
-ClickSquare 1_1
-Process
+# Move
+# ClickSquare 1_1
+# Process
 
-Move
-[
-  1_2
-  1_2
-  1_2
-  2_2
-  2_2
-  3_2
-]
-∧ClickSquare
-Process
+# Move
+# [
+#   1_2
+#   1_2
+#   1_2
+#   2_2
+#   2_2
+#   3_2
+# ]
+# ∧ClickSquare
+# Process
