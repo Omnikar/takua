@@ -15,14 +15,14 @@ Cap  ← 3
     # Capstones per player
     NCaps
   }
-  PieceCount ↚ ˜⊏[15_0 21_1 30_1 40_2 50_2]↥₀↧₄-₄
+  PieceCount ← ˜⊏[15_0 21_1 30_1 40_2 50_2]↥₀↧₄-₄
   # Create a new Board
   # Board ? Size
   Call ← New⊃(˜↯{}[0.]|↯˜⟜↯□[]|°⊟PieceCount)
   # The index of the current turn
   Turn ← ⧻History
 └─╴
-┌─╴Move
+┌─╴Move ~ ClickSquare
   # New move that has not been built yet
   |Uninit
   # Place a new piece on the board
@@ -44,36 +44,31 @@ Cap  ← 3
     Orig
   }
   New ← Uninit
-└─╴
 
-ClickSquare ← |3.2 Move!⍣(
-  # If a move hasn't been started yet
-  °Uninit :
-  # Check if the square is occupied
-  ⊡◡⊙Board~State
-  # If empty, start a place
-  # Otherwise, check that the active player
-  # controls this square and start a move
-  ⍣(Move 1 0_0 [] ⍩°1±◇⊢|ClickSquare⤙Place⋅0)
-| # If already placing and clicking on the same square,
-  # increment the piece type to be placed
-  # ˜⍜(-₁°Place)⊓(◿₃+₁)°.
-  ⍜(-₁°Place
-  | ⊙°.
-    ◡⋅⋅Board!⊃(State|NFlats|NCaps)
-    ˜∩>∩/+⊸¬=₃▽⊸±/◇⊂♭
-    ⨬(-₁⋅Cap°1)⨬(◿₂+₁|◿₃+₁)
-  ):
-| # If moving and clicking on the origin square
-  °.◡⋅Move~Orig
-  # And nowhere else has been clicked already
-  °[]◡⋅Move~Amnts
-  # Min number of stones and carry limit
-  𝄐⌞(↧◇∩⧻⊸⊡⊙⊸Board~State)
-  # Increment the number of stones being
-  # carried and limit accordingly
-  ⍜Move~Num(↧+₁)
-| Move!(
+  SwitchPlacement ↚ (
+    # If already placing and clicking on the same square,
+    # increment the piece type to be placed
+    ⍜(-₁°Place
+    | ⊙°.
+      ◡⋅⋅Board!⊃(State|NFlats|NCaps)
+      ˜∩>∩/+⊸¬=₃▽⊸±/◇⊂♭
+      ⨬(-₁⋅Cap°1)⨬(◿₂+₁|◿₃+₁)
+    ):
+  )
+
+  PickUpPieces ↚ Move!(
+    # If moving and clicking on the origin square
+    °.◡⋅Orig
+    # And nowhere else has been clicked already
+    °[]◡⋅Amnts
+    # Min number of stones and carry limit
+    𝄐⌞(↧◇∩⧻⊸⊡⊙⊸Board~State)
+    # Increment the number of stones being
+    # carried and limit accordingly
+    ⍜Num(↧+₁)
+  )
+
+  MovePieces ↚ Move!(
     ◡⋅Dir
 
     TryMove ← (
@@ -98,9 +93,50 @@ ClickSquare ← |3.2 Move!⍣(
 
     °1≥/+⊸Move!⊃Amnts Num
   )
-| # If nothing else works, restart the move and try again
-  ⨬(ClickSquare⊙⋅Uninit)◌ ≍Uninit⊸:
-)
+
+  ClickSquare ← |3.2 ⍣(
+    # If a move hasn't been started yet
+    °Uninit :
+    # Check if the square is occupied
+    ⊡◡⊙Board~State
+    # If empty, start a place
+    # Otherwise, check that the active player
+    # controls this square and start a move
+    ⍣(Move 1 0_0 [] ⍩°1±◇⊢|ClickSquare⤙Place⋅0)
+  | SwitchPlacement
+  | PickUpPieces
+  | MovePieces
+  | # If nothing else works, restart the move and try again
+    ⨬(ClickSquare⊙⋅Uninit)◌ ≍Uninit⊸:
+  )
+└─╴
+
+# Transform board state based on a move
+┌─╴Process
+  # Process a placement
+  ProcessPlace ← Move!(
+    Place!⊃Pos Piece
+    ˜⌟⍜(°□⊡⊙Board~State)⊂
+  )
+  # Process a movement
+  ProcessMove ← Move~Move!⟜↓(
+    ⊃Num Orig
+    ⍜⊙⊙(°□⊡|Board~State)⊃↙↘
+  | ⊃(⇌Amnts|¤Dir|Orig)
+    ∧(⊃↘↙¯⊙:⊙+
+      ⊃⋅⋅∘⊙⍜⊙(°□⊡⊙Board~State)⊂)
+    ⋅◌
+    # Flatten walls
+    ⍜Board~State⍚₀⍜(⌵↘₁)↧₁
+  )
+  # Assert that a move is completely formed
+  Validate ← °1⊸⍣(=/+Move~Move!⊃Amnts Num)1
+  Call ← (
+    Validate
+    ⊃⍣ProcessPlace ProcessMove⋅Board~State
+    ⍜Board~History⊂
+  )
+└─╴
 
 Board 5
 
@@ -108,7 +144,10 @@ Board 5
 ⍜(°□ ⊡3_2 Board~State|⋅[¯Wall])
 
 Move
+ClickSquare 1_1
+Process
 
+Move
 [
   1_2
   1_2
@@ -118,3 +157,4 @@ Move
   3_2
 ]
 ∧ClickSquare
+Process
