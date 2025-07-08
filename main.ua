@@ -15,12 +15,32 @@ WinSize ← 700_700
 # Render voxels and rescale to screen size
 MkVoxels ← ▽₂⊢÷△₂⊸⊙WinSize voxels Scale: VoxelScale
 
+Code ← ⌅(+@A⊥26|⌝⊥26-@A⌵)
+
 ┌─╴GameMode
   |Local
-  # TODO: Online mode
+  |Online {
+    MyColor
+    OtherPort
+    Tunnel
+  }
 └─╴
 
-~GameState {GameMode ClickMap Texture Move Board}
+~GameState {ClickMap Texture Move Board GameMode}
+
+RedrawScene ← (
+  Scene⊸⊃GameState~Move GameState~Board
+
+  ⍣(◡⋅GameState~GameMode
+    ⍣(°GameMode~Local
+      °1◿₂⧻Board~History◡⋅GameState~Board
+    | °1GameMode~Online~MyColor)
+    ⍜⊃Scene~Hover Scene~State∩¯
+  | )
+
+  ∩MkVoxels Scene~IdxsAndBuild
+  GameState!°⊸⊃(ClickMap|I~Texture~Image Texture)
+)
 
 HandleBoardClick ← I~Mouse!Pressed‼Left(
   ⊙⊸GameState~ClickMap
@@ -35,14 +55,8 @@ HandleBoardClick ← I~Mouse!Pressed‼Left(
       ⍣(°⊸Move~Place~Piece ¯1|⋅Move~Uninit⍜°Move~Move∘)
     | )
   
-    ⊃Scene°⊸⊃GameState~Move GameState~Board
-    ⍣(◡⋅GameState~GameMode
-      °GameMode~Local
-      °1◿₂⧻Board~History◡⋅GameState~Board
-      ⍜⊃Scene~Hover Scene~State∩¯
-    | )
-    ∩MkVoxels Scene~IdxsAndBuild
-    GameState!°⊸⊃(ClickMap|I~Texture~Image Texture)
+    °⊸⊃GameState~Move GameState~Board
+    RedrawScene
   )
 )
 
@@ -52,7 +66,10 @@ HandleMoveSubmission ← ⍣(
   I~Draw~Text White 40 -50_60 WinSize ">"
   I~Key!Pressed‼(
     {Arrow@> Space @\n}
-  | Process
+  | ⍣(◡⊙⋅(GameMode~Online~Tunnel GameState~GameMode)
+      I~Net~Give ⍣⍜Move~Place~Piece¯∘
+    | )
+    Process
     ⍣(◡⋅GameState~GameMode
       °GameMode~Local
       ⍜Board~State¯
@@ -80,19 +97,45 @@ DrawPieceCounters ← (
   I~Draw~Text
 )
 
+⍢◌(&pf "[l]ocal or [o]nline? "
+   ¬⊃∊˜⊗"lo"⊢&sc)
+⨬GameMode~Local(
+  I~Net~Start LocalPort:+⚂₁₀₀ 8080
+  ⊸I~Net~Port
+  ⟜(&p $"Your code is _" Code)
+  &pf "Enter opponent's code: "
+  °Code &sc
+  ⊃>⟜𝄐I~Net~Connect
+  GameMode~Online
+)
+
 Board 5
 Move
 
 I~Open WinSize "Tak"
+I~Window!°FPS 30
 
 ⊙I~Texture~LoadImage ∩MkVoxels Scene~IdxsAndBuild◡Scene
 
-GameState GameMode~Local
+GameState
 
 I~Loop!(
-  HandleMoveSubmission
-
-  HandleBoardClick
+  ⊸GameState~GameMode
+  ⍣(⍣°GameMode~Local(
+      ◌°.◿₂⧻Board~History◡⋅GameState~Board GameMode~Online~MyColor
+    )
+    HandleBoardClick
+    HandleMoveSubmission
+  | ˜⊏Player₂_Player₁ GameMode~Online~MyColor
+    I~Draw~Text ⊙(30 100_100 "Waiting for opponent...")
+    GameMode~Online~Tunnel⊸GameState~GameMode
+    I~Net~Get!(
+      &p "got thing"
+      °⊸GameState~Move
+      ⍜⊃(GameState~Move|GameState~Board)(Move Process)
+      RedrawScene
+    )
+  )
 
   I~Draw~Background ↯4 0
   I~Draw~Background ⊸GameState~Texture
