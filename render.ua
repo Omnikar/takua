@@ -26,8 +26,9 @@ VoxelRes ← 25
 
 ApplyLighting ← (
   ⊸♭°⍉↯⟜↯5⇌[0 0 0 1 2]⊣⊸°⍉
-  ×¬×0.3FFTConvolve~Same÷/+
+  ⍜⊙(↙₃°⍉)×⌞¬×0.3FFTConvolve~Same÷/+
 )
+HollowModel ← ⍜(⊣°⍉|×<6⁅⊸FFTConvolve~Same↯˙↯3⋯4281360)
 
 BoardModel ← T‼"\nBoardModel"memo(
   ⍜(×⊙-|⇡⁅)VoxelRes⊸⊃¯+BoardPadding
@@ -40,7 +41,8 @@ BoardModel ← T‼"\nBoardModel"memo(
   ⊚≥2/+°⍉<BoardTrimWidth
   ⍜⊡≡⋅BoardTrim
   ⍜°⍉⊂⊙1
-  # ApplyLighting
+  ApplyLighting
+  HollowModel
 )
 
 BoardIdxModel ← T‼"BoardIdxModel"memo(
@@ -58,12 +60,14 @@ RawFlatModel ← T‼"RawFlatModel"(
 
 FlatModel ← T‼"FlatModel"memo(
   RawFlatModel
-  # ApplyLighting
+  ApplyLighting
+  HollowModel
 )
 
 WallModel ← T‼"WallModel"memo(
   ⤸₁RawFlatModel
-  # ApplyLighting
+  ApplyLighting
+  HollowModel
 )
 
 CapModel ← T‼"CapModel"memo(
@@ -74,7 +78,8 @@ CapModel ← T‼"CapModel"memo(
   ⊗1⍉⊸≤⌟
   ⨬(+0.1×10˙×|0.2|+0.16×4˙×-0.3|0.2)
   ⊏⇌⊞<
-  # ApplyLighting
+  ApplyLighting
+  HollowModel
 )
 
 # ? Coord Model
