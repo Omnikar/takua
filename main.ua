@@ -3,7 +3,9 @@ I ~ "git: github.com/Marcos-cat/iris"
 ~ "game"
   ~ Board Move Process
   ~ Cap Flat Wall
-~ "render" ~ Scene
+~ "render"
+  ~ Player₁ Player₂
+  ~ Scene
 
 VoxelScale ← 2.5
 
@@ -77,6 +79,22 @@ I~Loop!(
 
   I~Draw~Background ↯4 0
   I~Draw~Background ⊸GameState~Texture
+
+  ⊸⊃(
+    GameState~GameMode
+  | Board!⊃(◿₂⧻History|State|NFlats|NCaps)GameState~Board)
+  ⍥¯×=GameMode~Local
+  ⟜¯
+  ∩⌟₂(
+    ↥₀
+    /◇⊂♭
+    ⊃(∊Flat_Wall|=Cap)
+    ˜∩-∩(/+)
+  )
+  °⋕⊟₄
+  [20_20 20_60 [-55⊢WinSize 20] [-55⊢WinSize 60]]
+  ▽2Player₁_Player₂ 40
+  I~Draw~Text
 )
 
 ⊃GameState~GameMode(⊂Board!⊃History State GameState~Board)
