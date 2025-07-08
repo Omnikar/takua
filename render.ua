@@ -22,13 +22,16 @@ BoardTrimWidth   ← 0.02
 FlatWidth     ← 0.7
 FlatThickness ← 0.25
 
+ShadowFactor ← 0.5
+
 VoxelRes ← 25
 
 ApplyLighting ← (
   ⊸♭°⍉↯⟜↯5⇌[0 0 0 1 2]⊣⊸°⍉
-  ⍜⊙(↙₃°⍉)×⌞¬×0.3FFTConvolve~Same÷/+
+  ⍜⊙(↙₃°⍉)×⌞¬×ShadowFactor FFTConvolve~Same÷/+
 )
-HollowModel ← ⍜(⊣°⍉|×<6⁅⊸FFTConvolve~Same↯˙↯3⋯4281360)
+HollowChannel ← ×<6⁅FFTConvolve~Same↯˙↯3⋯4281360⊸±
+HollowModel   ← ⍜(⊣°⍉)HollowChannel
 
 BoardModel ← memo(
   ⍜(×⊙-|⇡⁅)VoxelRes⊸⊃¯+BoardPadding
@@ -50,6 +53,7 @@ BoardIdxModel ← memo(
   -₁÷⊸±˜◿⊸∩+₁⌊
   ↧⊸↥0+₁˜⌝⊥˙⊞˜⊟
   ↯+₁⁅×BoardThickness VoxelRes
+  HollowChannel
 )
 
 RawFlatModel ← (
@@ -72,11 +76,11 @@ WallModel ← memo(
 
 CapModel ← memo(
   ⊟0⬚1↙₄˜⊏Player₂_Player₁↥₀
-  ⌵˙⊞ℂ-⊸¬÷⟜⇡×2VoxelRes
-  ⍜×(⇡⁅)×2VoxelRes0.5
-  [0.1 0.2 0.4 0.5]
+  ⌵˙⊞ℂ-1/2÷⟜⇡ ⁅×0.9 VoxelRes
+  ÷-1⟜⇡ ⁅×0.7 VoxelRes
+  [0.4 0.9 1]
   ⊗1⍉⊸≤⌟
-  ⨬(+0.1×10˙×|0.2|+0.16×4˙×-0.3|0.2)
+  ⨬(÷4√¬˙×-1×4|+0.12×2˙×-0.6|0.3)
   ⊏⇌⊞<
   ApplyLighting
   HollowModel
@@ -133,6 +137,8 @@ PlacePieces ← ∧(⬚0↥PlaceModel⊙⨬(FlatModel|WallModel|CapModel))⊙(-�
       ≡⌟⊂ +2+◇⧻⊡
       PlacePieces
     )
+
+    ⬚0⍜⊙⧻↥⁅×VoxelRes+×10FlatThickness BoardThickness
   )
 
   # IdxsVoxels BoardVoxels ? Scene

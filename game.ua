@@ -130,7 +130,7 @@ Cap  ← 3
     ⍜Board~State⍚₀⍜(⌵↘₁)↧₁
   )
   # Assert that a move is completely formed
-  Validate ← °1⊸⍣(=/+Move~Move!⊃Amnts Num)1
+  Validate ← °1⊸Move!⍣(0°Uninit|=/+Move!⊃Amnts Num|1)
   Call ← (
     Validate
     ⊃⍣ProcessPlace ProcessMove⋅Board~State
