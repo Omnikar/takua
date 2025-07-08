@@ -64,6 +64,24 @@ HandleMoveSubmission ← ⍣(
   °⊸⊃GameState~Move GameState~Board
 | )
 
+DrawPieceCounters ← (
+  ⊸⊃(
+    GameState~GameMode
+  | Board!⊃(◿₂⧻History|State|NFlats|NCaps)GameState~Board)
+  ⍥¯×=GameMode~Local
+  ⟜¯
+  ∩⌟₂(
+    ↥₀
+    /◇⊂♭
+    ⊃(∊Flat_Wall|=Cap)
+    ˜∩-∩/+
+  )
+  °⋕⊟₄
+  [20_20 20_60 [-55⊢WinSize 20] [-55⊢WinSize 60]]
+  ▽2Player₁_Player₂ 40
+  I~Draw~Text
+)
+
 Board 5
 Move
 
@@ -81,21 +99,7 @@ I~Loop!(
   I~Draw~Background ↯4 0
   I~Draw~Background ⊸GameState~Texture
 
-  ⊸⊃(
-    GameState~GameMode
-  | Board!⊃(◿₂⧻History|State|NFlats|NCaps)GameState~Board)
-  ⍥¯×=GameMode~Local
-  ⟜¯
-  ∩⌟₂(
-    ↥₀
-    /◇⊂♭
-    ⊃(∊Flat_Wall|=Cap)
-    ˜∩-∩(/+)
-  )
-  °⋕⊟₄
-  [20_20 20_60 [-55⊢WinSize 20] [-55⊢WinSize 60]]
-  ▽2Player₁_Player₂ 40
-  I~Draw~Text
+  DrawPieceCounters
 )
 
 ⊃GameState~GameMode(⊂Board!⊃History State GameState~Board)
