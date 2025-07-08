@@ -87,16 +87,16 @@ CapModel ← memo(
   HollowModel
 )
 
-# ? Coord Model
+# ? Coord Model SceneModel
 PlaceModel ← (
-  +⊂0×OffsetFactor⍜°⊟BoxMuller⊸gen 2
-  ⌝↘⁅⍜°⊂⊓(
+  ⁅⍜°⊂⊓(
     ×VoxelRes+BoardThickness×FlatThickness
   | +÷₂-↘₁◡⋅⋅△₃⟜×VoxelRes+BoardPadding)
+  ⍜⊙(↙⊙↘)⊙◌ ⊙⟜₂(⬚0⍜⊙△₃↥+) ⟜△₃:
 )
 
 # ? Coords Pieces Board
-PlacePieces ← ∧(⬚0↥PlaceModel⊙⨬(FlatModel|WallModel|CapModel))⊙(-₁⊃⌵±)
+PlacePieces ← ∧(PlaceModel⊙⨬(FlatModel|WallModel|CapModel))⊙(-₁⊃⌵±)
 
 ┌─╴Scene
   ~ {
