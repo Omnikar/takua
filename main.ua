@@ -9,7 +9,7 @@ VoxelScale ← 2.5
 
 T‼ ← &p $"_ took _" ^0 ⍜now^1
 
-WinSize ← 500_500
+WinSize ← 700_700
 # Render voxels and rescale to screen size
 MkVoxels ← ▽₂⊢÷△₂⊸⊙WinSize voxels Scale: VoxelScale
 
@@ -78,3 +78,6 @@ I~Loop!(
   I~Draw~Background ↯4 0
   I~Draw~Background ⊸GameState~Texture
 )
+
+⊃GameState~GameMode(⊂Board!⊃History State GameState~Board)
+≡&s ⍥(⍥¯◿₂°⊏) =GameMode~Local
