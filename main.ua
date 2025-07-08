@@ -51,7 +51,7 @@ HandleMoveSubmission ← ⍣(
   Process~Validate
   I~Draw~Text White 40 -50_60 WinSize ">"
   I~Key!Pressed‼(
-    Arrow@>
+    {Arrow@> Space @\n}
   | Process
     ⍣(◡⋅GameState~GameMode
       °GameMode~Local
@@ -66,7 +66,7 @@ DrawPieceCounters ← (
   ⊸⊃(
     GameState~GameMode
   | Board!⊃(◿₂⧻History|State|NFlats|NCaps)GameState~Board)
-  ⍥¯×=GameMode~Local
+  ⍥¯×≍GameMode~Local
   ⟜¯
   ∩⌟₂(
     ↥₀
@@ -101,4 +101,4 @@ I~Loop!(
 )
 
 ⊃GameState~GameMode(⊂Board!⊃History State GameState~Board)
-≡&s ⍥(⍥¯◿₂°⊏) =GameMode~Local
+≡&s ⍥(⍥¯◿₂°⊏) ≍GameMode~Local

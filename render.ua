@@ -92,7 +92,7 @@ PlaceModel ← (
   ⁅⍜°⊂⊓(
     ×VoxelRes+BoardThickness×FlatThickness
   | +÷₂-↘₁◡⋅⋅△₃⟜×VoxelRes+BoardPadding)
-  ⍜⊙(↙⊙↘)⊙◌ ⊙⟜₂(⬚0⍜⊙△₃↥+) ⟜△₃:
+  ⍜⊙(↙⊙↘)↥ ⊙⟜₂(⬚0⍜⊙△₃↥+) ⟜△₃:
 )
 
 # ? Coords Pieces Board
