@@ -1,5 +1,5 @@
 # Experimental!
-~ "git: github.com/Omnikar/uiua-math" ~ FFTConvolve
+~ "git: github.com/Omnikar/uiua-math" ~ BoxMuller FFTConvolve
 
 ~ "game"
   ~ Board Move Process
@@ -23,6 +23,7 @@ FlatWidth     ← 0.7
 FlatThickness ← 0.25
 
 ShadowFactor ← 0.5
+OffsetFactor ← 0.015
 
 VoxelRes ← 25
 
@@ -87,9 +88,12 @@ CapModel ← memo(
 )
 
 # ? Coord Model
-PlaceModel ← ⌝↘⁅⍜°⊂⊓(
-  ×VoxelRes+BoardThickness×FlatThickness
-| +÷₂-↘₁◡⋅⋅△₃⟜×VoxelRes+BoardPadding)
+PlaceModel ← (
+  +⊂0×OffsetFactor⍜°⊟BoxMuller⊸gen 2
+  ⌝↘⁅⍜°⊂⊓(
+    ×VoxelRes+BoardThickness×FlatThickness
+  | +÷₂-↘₁◡⋅⋅△₃⟜×VoxelRes+BoardPadding)
+)
 
 # ? Coords Pieces Board
 PlacePieces ← ∧(⬚0↥PlaceModel⊙⨬(FlatModel|WallModel|CapModel))⊙(-₁⊃⌵±)
