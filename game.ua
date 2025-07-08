@@ -22,7 +22,7 @@ Cap  ← 3
   # The index of the current turn
   Turn ← ⧻History
 └─╴
-┌─╴Move ~ ClickSquare
+┌─╴Move
   # New move that has not been built yet
   |Uninit
   # Place a new piece on the board

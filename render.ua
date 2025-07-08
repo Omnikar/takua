@@ -1,14 +1,18 @@
 # Experimental!
+~ "git: github.com/Omnikar/uiua-math" ~ FFTConvolve
 
-~ "game.ua"
+~ "game"
   ~ Board Move Process
   ~ Cap Flat Wall
+
+T‼ ← &p $"_ took _" ^0 ⍜now^1
 
 BoardBase    ← ÷255[181 139 62]
 BoardBorders ← +0.01Black
 BoardTrim    ← ÷255[84 38 18]
 Player₁      ← ÷255[224 220 195]
 Player₂      ← ÷255[43 43 41]
+# Player₂ ← ÷255[79 56 27]
 
 BoardPadding     ← 0.3
 BoardThickness   ← 0.6
@@ -20,7 +24,12 @@ FlatThickness ← 0.25
 
 VoxelRes ← 25
 
-BoardModel ← memo(
+ApplyLighting ← (
+  ⊸♭°⍉↯⟜↯5⇌[0 0 0 1 2]⊣⊸°⍉
+  ×¬×0.3FFTConvolve~Same÷/+
+)
+
+BoardModel ← T‼"\nBoardModel"memo(
   ⍜(×⊙-|⇡⁅)VoxelRes⊸⊃¯+BoardPadding
   ⊃(×⊓⌟><⊃¯+÷₂BoardBorderWidth :
   | <÷₂BoardBorderWidth⌵-⊸⁅)
@@ -31,17 +40,33 @@ BoardModel ← memo(
   ⊚≥2/+°⍉<BoardTrimWidth
   ⍜⊡≡⋅BoardTrim
   ⍜°⍉⊂⊙1
+  # ApplyLighting
 )
 
-FlatModel ← memo(
+BoardIdxModel ← T‼"BoardIdxModel"memo(
+  ⍜(×⊙-|⇡⁅)VoxelRes⊸⊃¯+BoardPadding
+  -₁÷⊸±˜◿⊸∩+₁⌊
+  ↧⊸↥0+₁˜⌝⊥˙⊞˜⊟
+  ↯+₁⁅×BoardThickness VoxelRes
+)
+
+RawFlatModel ← T‼"RawFlatModel"(
   ⊸△˜⊏Player₂_Player₁↥₀
   ↯⊂⁅×VoxelRes[FlatThickness.FlatWidth]
   ⍜°⍉⊂⊙1
 )
 
-WallModel ← memo(⤸₁FlatModel)
+FlatModel ← T‼"FlatModel"memo(
+  RawFlatModel
+  # ApplyLighting
+)
 
-CapModel ← memo(
+WallModel ← T‼"WallModel"memo(
+  ⤸₁RawFlatModel
+  # ApplyLighting
+)
+
+CapModel ← T‼"CapModel"memo(
   ⊟0⬚1↙₄˜⊏Player₂_Player₁↥₀
   ⌵˙⊞ℂ-⊸¬÷⟜⇡×2VoxelRes
   ⍜×(⇡⁅)×2VoxelRes0.5
@@ -49,7 +74,7 @@ CapModel ← memo(
   ⊗1⍉⊸≤⌟
   ⨬(+0.1×10˙×|0.2|+0.16×4˙×-0.3|0.2)
   ⊏⇌⊞<
-  # ⍜(↙₃°⍉⊢)≡₀⋅0
+  # ApplyLighting
 )
 
 # ? Coord Model
@@ -57,32 +82,57 @@ PlaceModel ← ⌝↘⁅⍜°⊂⊓(
   ×VoxelRes+BoardThickness×FlatThickness
 | +÷₂-↘₁◡⋅⋅△₃⟜×VoxelRes+BoardPadding)
 
+# ? Coords Pieces Board
+PlacePieces ← ∧(⬚0↥PlaceModel⊙⨬(FlatModel|WallModel|CapModel))⊙(-₁⊃⌵±)
+
 ┌─╴Scene
   ~ {
-    # The board state to draw
-    Board
-    # Hovering pieces
-    Hover ← []
     # Hovering pieces position
-    HoverPos ← 0_0
+    HoverPos
+    # Hovering pieces
+    Hover
+    # The board state to draw
+    State
   }
+
+  # ? Move Board
+  Call ← (
+    New Move!⍣(
+      0_0 [] ⊓°Uninit Board~State
+    | # :¤⊓°Place Board~State
+      0_0 [] ⍜⊙(°□⊡)⊂⊓°Place Board~State
+    | Move!⟜↓(
+      | -/+⊃(Amnts|Num|Orig)
+        ⍜⊙⊙(°□⊡|Board~State)⊃↙↘
+      | °⊸Num/+⊸Amnts
+        𝄐⌟Process~ProcessMove
+        :Board~State
+      | +×⊃(⧻Amnts|Dir|Orig)
+      )
+    )
+  )
+
+  # Create a voxels model of the scene
+  Build ← (
+    # Draw normal pieces
+    ⟜(State
+      ⟜(BoardModel⧻)
+      ⟜⊡⊚⊸≠₀°⍉⬚0≡₀◇⇌
+      PlacePieces)
+
+    # Draw hover pieces
+    ⟜↓(
+      °⊏⇌Hover
+    | :HoverPos
+    | ⊃HoverPos State
+      ≡⌟⊂ +2+◇⧻⊡
+      PlacePieces
+    )
+  )
+
+  # IdxsVoxels BoardVoxels ? Scene
+  IdxsAndBuild ← (
+    ⊃State Build
+    ⬚0↙◡⋅⧻BoardIdxModel⧻
+  )
 └─╴
-
-Board 5
-
-⍜(°□ ⊡1_2 Board~State|⋅[¯Cap Flat .¯Flat])
-⍜(°□ ⊡3_2 Board~State|⋅[¯Wall Flat])
-⍜(°□ ⊡3_1 Board~State|⋅[Flat])
-⍜(°□ ⊡2_1 Board~State|⋅[Wall ¯Flat Flat])
-⍜(°□ ⊡3_3 Board~State|⋅[Cap])
-⍜(°□ ⊡2_2 Board~State|⋅[Wall])
-⍜(°□ ⊡1_3 Board~State|⋅[Wall])
-
-Scene Board~State
-Scene~Board
-⟜(BoardModel⧻)
-⟜(-₁⊃⌵±⊡)⊚⊸≠₀°⍉⬚0≡₀◇⇌
-∧(⬚0↥PlaceModel⊙⨬(FlatModel|WallModel|CapModel))
-
-voxels Scale:2.5
-&ims
