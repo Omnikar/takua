@@ -30,7 +30,7 @@ ApplyLighting ← (
 )
 HollowModel ← ⍜(⊣°⍉|×<6⁅⊸FFTConvolve~Same↯˙↯3⋯4281360)
 
-BoardModel ← T‼"\nBoardModel"memo(
+BoardModel ← memo(
   ⍜(×⊙-|⇡⁅)VoxelRes⊸⊃¯+BoardPadding
   ⊃(×⊓⌟><⊃¯+÷₂BoardBorderWidth :
   | <÷₂BoardBorderWidth⌵-⊸⁅)
@@ -45,32 +45,32 @@ BoardModel ← T‼"\nBoardModel"memo(
   HollowModel
 )
 
-BoardIdxModel ← T‼"BoardIdxModel"memo(
+BoardIdxModel ← memo(
   ⍜(×⊙-|⇡⁅)VoxelRes⊸⊃¯+BoardPadding
   -₁÷⊸±˜◿⊸∩+₁⌊
   ↧⊸↥0+₁˜⌝⊥˙⊞˜⊟
   ↯+₁⁅×BoardThickness VoxelRes
 )
 
-RawFlatModel ← T‼"RawFlatModel"(
+RawFlatModel ← (
   ⊸△˜⊏Player₂_Player₁↥₀
   ↯⊂⁅×VoxelRes[FlatThickness.FlatWidth]
   ⍜°⍉⊂⊙1
 )
 
-FlatModel ← T‼"FlatModel"memo(
+FlatModel ← memo(
   RawFlatModel
   ApplyLighting
   HollowModel
 )
 
-WallModel ← T‼"WallModel"memo(
+WallModel ← memo(
   ⤸₁RawFlatModel
   ApplyLighting
   HollowModel
 )
 
-CapModel ← T‼"CapModel"memo(
+CapModel ← memo(
   ⊟0⬚1↙₄˜⊏Player₂_Player₁↥₀
   ⌵˙⊞ℂ-⊸¬÷⟜⇡×2VoxelRes
   ⍜×(⇡⁅)×2VoxelRes0.5

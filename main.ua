@@ -12,7 +12,7 @@ T‼ ← &p $"_ took _" ^0 ⍜now^1
 WinSize   ← 500_500
 DrawBoard ← ⊸I~Draw~Background
 # Render voxels and rescale to screen size
-MkVoxels ← T‼"** MkVoxels"(▽₂⊢÷△₂⊸⊙WinSize voxels Scale: VoxelScale)
+MkVoxels ← ▽₂⊢÷△₂⊸⊙WinSize voxels Scale: VoxelScale
 
 Board 5
 ⍜(°□ ⊡1_2 Board~State|⋅[Cap Flat ¯Flat Flat])
