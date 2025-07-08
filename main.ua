@@ -32,12 +32,10 @@ HandleBoardClick ← I~Mouse!Pressed‼Left(
   
     # Opponents place each other's flats on the first two moves
     ⍣(°1<2⧻◡⋅Board~History
-      °⊸Move~Place~Piece ¯1
-    | ⋅Move~Uninit⍜°Move~Move∘
+      ⍣(°⊸Move~Place~Piece ¯1|⋅Move~Uninit⍜°Move~Move∘)
     | )
   
-    ⟜₂°⊸⊃GameState~Move GameState~Board
-    Scene
+    ⊃Scene°⊸⊃GameState~Move GameState~Board
     ⍣(◡⋅GameState~GameMode
       °GameMode~Local
       °1◿₂⧻Board~History◡⋅GameState~Board
