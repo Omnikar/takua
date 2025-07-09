@@ -19,7 +19,8 @@ SphToRect ← ˜⊂×⍜°⊟∩°∠
 # Render voxels and rescale to screen size
 # ? Voxels CamPos
 MkVoxels ← ▽₂⊢÷△₂⊸⊙WinSize voxels (Scale:VoxelScale) ⊙(Camera:SphToRect)
-Message  ← I~Draw~Text White 30 100_100
+Message₁ ← I~Draw~Text White 30 100_100
+Message₂ ← I~Draw~Text White 30 100_140
 
 ┌─╴GameMode
   |Local
@@ -124,14 +125,14 @@ HandleWinState ← (
     # Bias for the active player in case of a double road
     ⍜⊏(+0.1)
   | °1⊸/↥ Board~CheckFlatWin)
-  ⍣(Message "Draw" °1_1
+  ⍣(Message₁ "Draw" °1_1
   | ⊢⍖
     ⍣(◡⋅⊃GameState~GameMode GameState~Board
       °GameMode~Local
       ≠◿₂Board~Turn
       {"White wins!" "Black wins!"}
     | {"You win!" "You lose!"})
-    Message˜⊏)
+    Message₁˜⊏)
 )
 
 HandleActivePlayer ← (
@@ -146,7 +147,7 @@ HandleActivePlayer ← (
 HandleMultiplayerWait ← (
   ⊸GameState~GameMode
   GameMode~Online~Tunnel
-  Message "Waiting for opponent..."
+  Message₁ "Waiting for opponent..."
   I~Net~Get!(
     °⊸GameState~Move
     ⍜⊃(GameState~Move|GameState~Board)(Move Process)
@@ -176,7 +177,7 @@ DrawPastMessage ← (
   ⊸±-⊸↧⊸⊃GameState~PastView(Board~Turn GameState~Board)
   ⨬◌(⟜(⨬""@s>1)
      # TODO: Fix this overlapping with "Waiting for opponent..."
-     Message $"_ move_ ago")
+     Message₂ $"_ move_ ago")
 )
 
 ⍢◌(&pf "[l]ocal or [o]nline? "
