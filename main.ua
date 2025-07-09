@@ -37,14 +37,22 @@ Message  ← I~Draw~Text White 30 100_100
   Board
   GameMode
   CamPos ← [π/4 ∠√2 1]
+  # Turn to view; ∞ means present
+  PastView ← ∞
 }
 
 RedrawScene ← (
-  Scene⊸⊃GameState~Move GameState~Board
+  # If PastView is ∞, create a scene out of the present
+  # Otherwise, make one out of the corresponding past state
+  ⊸GameState~PastView
+  ⍣(⊸⊃GameState~Move GameState~Board °∞
+  | Move°⊸Board~State⊏⊙(⊸Board~History⊸GameState~Board))
+
+  Scene
 
   ⍣(◡⋅GameState~GameMode
     ⍣(°GameMode~Local
-      °1◿₂Board~Turn◡⋅GameState~Board
+      °1◿₂↧Board~Turn◡⋅⊃GameState~Board GameState~PastView
     | °1GameMode~Online~MyColor)
     ⍜⊃Scene~Hover Scene~State∩¯
   | )
@@ -57,6 +65,15 @@ HandleCamRotation ← (
   ⊸≠₀/+I~Key~ULDR 0
   ⨬◌(×I~Window~Dt⊟¯°ℂ
      ⍜⊙GameState~CamPos-
+     RedrawScene)
+)
+
+HandlePastViewing ← (
+  ⊸⌵-∩I~Key~Pressed @- @=
+  ⨬◌(⊙(⊸⊃GameState~PastView(Board~Turn GameState~Board)
+       ⍥⋅.⊸=∞)
+     ⍥⋅∞⤚≤↥₀+
+     °⊸GameState~PastView
      RedrawScene)
 )
 
@@ -74,6 +91,7 @@ HandleBoardClick ← I~Mouse!Pressed‼Left(
     | )
   
     °⊸⊃GameState~Move GameState~Board
+    °⊸GameState~PastView ∞
     RedrawScene
   )
 )
@@ -151,6 +169,13 @@ DrawPieceCounters ← (
   I~Draw~Text
 )
 
+DrawPastMessage ← (
+  ⊸±-⊸↧⊸⊃GameState~PastView(Board~Turn GameState~Board)
+  ⨬◌(⟜(⨬""@s>1)
+     # TODO: Fix this overlapping with "Waiting for opponent..."
+     Message $"_ move_ ago")
+)
+
 ⍢◌(&pf "[l]ocal or [o]nline? "
    ¬⊃∊˜⊗"lo"⊢&sc)
 ⨬GameMode~Local(
@@ -178,6 +203,8 @@ RedrawScene
 I~Loop!(
   HandleCamRotation
 
+  HandlePastViewing
+
   ⍣(HandleWinState
   | HandleActivePlayer
   | HandleMultiplayerWait)
@@ -186,6 +213,8 @@ I~Loop!(
   I~Draw~Background ⊸GameState~Texture
 
   DrawPieceCounters
+
+  DrawPastMessage
 )
 
 ⊃GameState~GameMode(⊂Board!⊃History State GameState~Board)
