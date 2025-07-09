@@ -116,19 +116,22 @@ HandleMoveSubmission ← ⍣(
 | )
 
 HandleWinState ← (
-  ⟜(°1⊸/↥Board~CheckWin) ⊸GameState~Board
-  ⍣(◡⋅⋅GameState~GameMode◿₂Board~Turn
-    =GameMode~Online~MyColor
-  )⋅1
-  # Bias for the active player in case of a double road
-  ⍜⊏(+0.1)
-  ⊢⍖
-  ⍣(◡⋅⊃GameState~GameMode GameState~Board
-    °GameMode~Local
-    ≠◿₂Board~Turn
-    {"White wins!" "Black wins!"}
-  | {"You win!" "You lose!"})
-  Message˜⊏
+  ⊸GameState~Board
+  ⍣(⟜(°1⊸/↥Board~CheckRoadWin)
+    ⍣(◡⋅⋅GameState~GameMode◿₂Board~Turn
+      =GameMode~Online~MyColor
+    )⋅1
+    # Bias for the active player in case of a double road
+    ⍜⊏(+0.1)
+  | °1⊸/↥ Board~CheckFlatWin)
+  ⍣(Message "Draw" °1_1
+  | ⊢⍖
+    ⍣(◡⋅⊃GameState~GameMode GameState~Board
+      °GameMode~Local
+      ≠◿₂Board~Turn
+      {"White wins!" "Black wins!"}
+    | {"You win!" "You lose!"})
+    Message˜⊏)
 )
 
 HandleActivePlayer ← (
@@ -158,8 +161,7 @@ DrawPieceCounters ← (
   ⍥¯×≍GameMode~Local
   ⟜¯
   ∩⌟₂(
-    ↥₀
-    /◇⊂♭
+    /◇⊂♭ ↥₀
     ⊃(∊Flat_Wall|=Cap)
     ˜∩-∩/+
   )

@@ -21,11 +21,20 @@ Cap  ← 3
   Call ← New⊃(˜↯{}[0.]|↯˜⟜↯□[]|°⊟PieceCount)
   # The index of the current turn
   Turn ← ⧻History
-  # Check for winning state for both players
-  CheckWin ← ⊟∩(
+  # Check for a winning state by completed road for both players
+  CheckRoadWin ← ⊟∩(
     𝄐⌟:⊸⍉↯⊸⧻+×2⊸⇌=₀°⊏
     /∨=₃⊂⊜∩(/+◴)∊Flat_Cap≡₀◇⬚0⊢
   )⟜¯ State
+  # Check for a flat win/draw when the board is filled or one player runs out of pieces
+  CheckFlatWin ← (
+    ♭⊃(State|NFlats|NCaps)
+    ⍣(⤚⍣(
+        °0↧∩⌟₂(↥˜∩-∩/+⊃(∊Flat_Wall|=Cap)/◇⊂↥₀)⟜¯
+      | °1/×±≡◇⧻)
+      ⊟⊃≤≥∩/+∩⌞=Flat⟜¯≡◇⬚0⊢
+    )0_0
+  )
 └─╴
 
 ┌─╴Move
@@ -143,24 +152,3 @@ Cap  ← 3
     ⍜Board~History⊂
   )
 └─╴
-
-# Board 5
-
-# ⍜(°□ ⊡1_2 Board~State|⋅[Cap Flat ¯Flat])
-# ⍜(°□ ⊡3_2 Board~State|⋅[¯Wall])
-
-# Move
-# ClickSquare 1_1
-# Process
-
-# Move
-# [
-#   1_2
-#   1_2
-#   1_2
-#   2_2
-#   2_2
-#   3_2
-# ]
-# ∧ClickSquare
-# Process
