@@ -157,7 +157,8 @@ HandleMultiplayerWait ← (
 DrawPieceCounters ← (
   ⊸⊃(
     GameState~GameMode
-  | Board!⊃(◿₂Turn|State|NFlats|NCaps)GameState~Board)
+  | ⊃GameState~Board GameState~PastView
+    Board!⊃(◿₂↧Turn|⍣(˜⊏History|State)|NFlats|NCaps))
   ⍥¯×≍GameMode~Local
   ⟜¯
   ∩⌟₂(
