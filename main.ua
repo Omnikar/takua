@@ -33,7 +33,7 @@ RedrawScene ← (
 
   ⍣(◡⋅GameState~GameMode
     ⍣(°GameMode~Local
-      °1◿₂⧻Board~History◡⋅GameState~Board
+      °1◿₂Board~Turn◡⋅GameState~Board
     | °1GameMode~Online~MyColor)
     ⍜⊃Scene~Hover Scene~State∩¯
   | )
@@ -51,7 +51,7 @@ HandleBoardClick ← I~Mouse!Pressed‼Left(
     Move~ClickSquare
   
     # Opponents place each other's flats on the first two moves
-    ⍣(°1<2⧻◡⋅Board~History
+    ⍣(°1<2◡⋅Board~Turn
       ⍣(°⊸Move~Place~Piece ¯1|⋅Move~Uninit⍜°Move~Move∘)
     | )
   
@@ -82,7 +82,7 @@ HandleMoveSubmission ← ⍣(
 DrawPieceCounters ← (
   ⊸⊃(
     GameState~GameMode
-  | Board!⊃(◿₂⧻History|State|NFlats|NCaps)GameState~Board)
+  | Board!⊃(◿₂Turn|State|NFlats|NCaps)GameState~Board)
   ⍥¯×≍GameMode~Local
   ⟜¯
   ∩⌟₂(
@@ -122,7 +122,7 @@ GameState
 I~Loop!(
   ⊸GameState~GameMode
   ⍣(⍣°GameMode~Local(
-      ◌°.◿₂⧻Board~History◡⋅GameState~Board GameMode~Online~MyColor
+      ◌°.◿₂Board~Turn◡⋅GameState~Board GameMode~Online~MyColor
     )
     HandleBoardClick
     HandleMoveSubmission

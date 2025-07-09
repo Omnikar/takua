@@ -22,6 +22,7 @@ Cap  ← 3
   # The index of the current turn
   Turn ← ⧻History
 └─╴
+
 ┌─╴Move
   # New move that has not been built yet
   |Uninit
