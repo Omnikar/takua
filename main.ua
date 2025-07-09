@@ -159,7 +159,7 @@ DrawPieceCounters ← (
     GameState~GameMode
   | ⊃GameState~Board GameState~PastView
     Board!⊃(◿₂↧Turn|⍣(˜⊏History|State)|NFlats|NCaps))
-  ⍥¯×≍GameMode~Local
+  ⍥¯ ⍣(⊓GameMode~Online~MyColor◌|◌)
   ⟜¯
   ∩⌟₂(
     /◇⊂♭ ↥₀
