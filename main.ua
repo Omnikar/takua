@@ -68,7 +68,7 @@ HandleMoveSubmission ← ⍣(
   I~Key!Pressed‼(
     {Arrow@> Space @\n}
   | ⍣(◡⊙⋅(GameMode~Online~Tunnel GameState~GameMode)
-      &p "sent" I~Net~Give &p"sending" ⍣⍜Move~Place~Piece¯∘
+      I~Net~Give ⍣⍜Move~Place~Piece¯∘
     | )
     Process
     ⍣(◡⋅GameState~GameMode
