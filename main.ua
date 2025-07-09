@@ -14,6 +14,7 @@ T‼ ← &p $"_ took _" ^0 ⍜now^1
 WinSize ← 700_700
 # Render voxels and rescale to screen size
 MkVoxels ← ▽₂⊢÷△₂⊸⊙WinSize voxels Scale: VoxelScale
+Message  ← I~Draw~Text White 30 100_100
 
 Code ← ⌅(+@A⊥26|⌝⊥26-@A⌵)
 
@@ -67,7 +68,7 @@ HandleMoveSubmission ← ⍣(
   I~Key!Pressed‼(
     {Arrow@> Space @\n}
   | ⍣(◡⊙⋅(GameMode~Online~Tunnel GameState~GameMode)
-      I~Net~Give ⍣⍜Move~Place~Piece¯∘
+      &p "sent" I~Net~Give &p"sending" ⍣⍜Move~Place~Piece¯∘
     | )
     Process
     ⍣(◡⋅GameState~GameMode
@@ -120,19 +121,32 @@ I~Window!°FPS 30
 GameState
 
 I~Loop!(
-  ⊸GameState~GameMode
-  ⍣(⍣°GameMode~Local(
-      ◌°.◿₂Board~Turn◡⋅GameState~Board GameMode~Online~MyColor
-    )
-    HandleBoardClick
-    HandleMoveSubmission
-  | ˜⊏Player₂_Player₁ GameMode~Online~MyColor
-    I~Draw~Text ⊙(30 100_100 "Waiting for opponent...")
-    GameMode~Online~Tunnel⊸GameState~GameMode
-    I~Net~Get!(
-      °⊸GameState~Move
-      ⍜⊃(GameState~Move|GameState~Board)(Move Process)
-      RedrawScene
+  ⍣(⟜(°1⊸/↥Board~CheckWin) ⊸GameState~Board
+    ⍣(◡⋅⋅GameState~GameMode◿₂Board~Turn
+      =GameMode~Online~MyColor
+    )⋅1
+    # Bias for the active player in case of a double road
+    ⍜⊏(+0.1)
+    ⊢⍖
+    ⍣(◡⋅⊃GameState~GameMode GameState~Board
+      °GameMode~Local
+      ≠◿₂Board~Turn
+      {"White wins!" "Black wins!"}
+    | {"You win!" "You lose!"})
+    Message˜⊏
+  | ⊸GameState~GameMode
+    ⍣(⍣°GameMode~Local(
+        ◌°.◿₂Board~Turn◡⋅GameState~Board GameMode~Online~MyColor
+      )
+      HandleBoardClick
+      HandleMoveSubmission
+    | Message "Waiting for opponent..."
+      GameMode~Online~Tunnel
+      I~Net~Get!(
+        °⊸GameState~Move
+        ⍜⊃(GameState~Move|GameState~Board)(Move Process)
+        RedrawScene
+      )
     )
   )
 

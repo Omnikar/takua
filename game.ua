@@ -21,6 +21,11 @@ Cap  ← 3
   Call ← New⊃(˜↯{}[0.]|↯˜⟜↯□[]|°⊟PieceCount)
   # The index of the current turn
   Turn ← ⧻History
+  # Check for winning state for both players
+  CheckWin ← ⊟∩(
+    𝄐⌟:⊸⍉↯⊸⧻+×2⊸⇌=₀°⊏
+    /∨=₃⊂⊜∩(/+◴)∊1_3≡₀◇⬚0⊢
+  )⟜¯ State
 └─╴
 
 ┌─╴Move
