@@ -3,4 +3,6 @@
 # Takua
 Uiua implementation of the abstract strategy game Tak (WIP)
 
-Press space, enter, or the right arrow key to submit a move once it's been completed.
+Press space or enter to submit a move once it's been completed.
+
+Use the arrow keys to rotate the camera view.

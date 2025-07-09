@@ -7,16 +7,19 @@ I ~ "git: github.com/Marcos-cat/iris"
   ~ Player₁ Player₂
   ~ Scene
 
-VoxelScale ← 2.5
-
 T‼ ← &p $"_ took _" ^0 ⍜now^1
 
-WinSize ← 700_700
-# Render voxels and rescale to screen size
-MkVoxels ← ▽₂⊢÷△₂⊸⊙WinSize voxels Scale: VoxelScale
-Message  ← I~Draw~Text White 30 100_100
+VoxelScale ← 2.5
+WinSize    ← 700_700
 
 Code ← ⌅(+@A⊥26|⌝⊥26-@A⌵)
+# Normalized spherical to rectangular coordinates
+SphToRect ← ˜⊂×⍜°⊟∩°∠
+
+# Render voxels and rescale to screen size
+# ? Voxels CamPos
+MkVoxels ← ▽₂⊢÷△₂⊸⊙WinSize voxels (Scale:VoxelScale) ⊙(Camera:SphToRect)
+Message  ← I~Draw~Text White 30 100_100
 
 ┌─╴GameMode
   |Local
@@ -27,7 +30,14 @@ Code ← ⌅(+@A⊥26|⌝⊥26-@A⌵)
   }
 └─╴
 
-~GameState {ClickMap Texture Move Board GameMode}
+~GameState {
+  ClickMap
+  Texture
+  Move
+  Board
+  GameMode
+  CamPos ← [π/4 ∠√2 1]
+}
 
 RedrawScene ← (
   Scene⊸⊃GameState~Move GameState~Board
@@ -39,8 +49,15 @@ RedrawScene ← (
     ⍜⊃Scene~Hover Scene~State∩¯
   | )
 
-  ∩MkVoxels Scene~IdxsAndBuild
+  ∩⌟MkVoxels Scene~IdxsAndBuild ⊙⊸GameState~CamPos
   GameState!°⊸⊃(ClickMap|I~Texture~Image Texture)
+)
+
+HandleCamRotation ← (
+  ⊸≠₀/+I~Key~ULDR 0
+  ⨬◌(×I~Window~Dt⊟¯°ℂ
+     ⍜⊙GameState~CamPos-
+     RedrawScene)
 )
 
 HandleBoardClick ← I~Mouse!Pressed‼Left(
@@ -66,7 +83,7 @@ HandleMoveSubmission ← ⍣(
   Process~Validate
   I~Draw~Text White 40 -50_60 WinSize ">"
   I~Key!Pressed‼(
-    {Arrow@> Space @\n}
+    {Space @\n}
   | ⍣(◡⊙⋅(GameMode~Online~Tunnel GameState~GameMode)
       I~Net~Give ⍣⍜Move~Place~Piece¯∘
     | )
@@ -79,6 +96,42 @@ HandleMoveSubmission ← ⍣(
   )
   °⊸⊃GameState~Move GameState~Board
 | )
+
+HandleWinState ← (
+  ⟜(°1⊸/↥Board~CheckWin) ⊸GameState~Board
+  ⍣(◡⋅⋅GameState~GameMode◿₂Board~Turn
+    =GameMode~Online~MyColor
+  )⋅1
+  # Bias for the active player in case of a double road
+  ⍜⊏(+0.1)
+  ⊢⍖
+  ⍣(◡⋅⊃GameState~GameMode GameState~Board
+    °GameMode~Local
+    ≠◿₂Board~Turn
+    {"White wins!" "Black wins!"}
+  | {"You win!" "You lose!"})
+  Message˜⊏
+)
+
+HandleActivePlayer ← (
+  ⊸GameState~GameMode
+  ⍣°GameMode~Local(
+    ◌°.◿₂Board~Turn◡⋅GameState~Board GameMode~Online~MyColor
+  )
+  HandleBoardClick
+  HandleMoveSubmission
+)
+
+HandleMultiplayerWait ← (
+  ⊸GameState~GameMode
+  GameMode~Online~Tunnel
+  Message "Waiting for opponent..."
+  I~Net~Get!(
+    °⊸GameState~Move
+    ⍜⊃(GameState~Move|GameState~Board)(Move Process)
+    RedrawScene
+  )
+)
 
 DrawPieceCounters ← (
   ⊸⊃(
@@ -116,39 +169,18 @@ Move
 I~Open WinSize "Tak"
 I~Window!°FPS 30
 
-⊙I~Texture~LoadImage ∩MkVoxels Scene~IdxsAndBuild◡Scene
+⊙I~Texture~LoadImage ∩⌟↯ ⟜⊂WinSize 4 0
 
 GameState
 
+RedrawScene
+
 I~Loop!(
-  ⍣(⟜(°1⊸/↥Board~CheckWin) ⊸GameState~Board
-    ⍣(◡⋅⋅GameState~GameMode◿₂Board~Turn
-      =GameMode~Online~MyColor
-    )⋅1
-    # Bias for the active player in case of a double road
-    ⍜⊏(+0.1)
-    ⊢⍖
-    ⍣(◡⋅⊃GameState~GameMode GameState~Board
-      °GameMode~Local
-      ≠◿₂Board~Turn
-      {"White wins!" "Black wins!"}
-    | {"You win!" "You lose!"})
-    Message˜⊏
-  | ⊸GameState~GameMode
-    ⍣(⍣°GameMode~Local(
-        ◌°.◿₂Board~Turn◡⋅GameState~Board GameMode~Online~MyColor
-      )
-      HandleBoardClick
-      HandleMoveSubmission
-    | Message "Waiting for opponent..."
-      GameMode~Online~Tunnel
-      I~Net~Get!(
-        °⊸GameState~Move
-        ⍜⊃(GameState~Move|GameState~Board)(Move Process)
-        RedrawScene
-      )
-    )
-  )
+  HandleCamRotation
+
+  ⍣(HandleWinState
+  | HandleActivePlayer
+  | HandleMultiplayerWait)
 
   I~Draw~Background ↯4 0
   I~Draw~Background ⊸GameState~Texture
