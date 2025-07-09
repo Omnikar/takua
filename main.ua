@@ -130,7 +130,6 @@ I~Loop!(
     I~Draw~Text ⊙(30 100_100 "Waiting for opponent...")
     GameMode~Online~Tunnel⊸GameState~GameMode
     I~Net~Get!(
-      &p "got thing"
       °⊸GameState~Move
       ⍜⊃(GameState~Move|GameState~Board)(Move Process)
       RedrawScene
