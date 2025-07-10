@@ -180,6 +180,12 @@ DrawPastMessage ← (
      Message₂ $"_ move_ ago")
 )
 
+ExportPTN ← (
+  Board~PTNRecord⊸GameState~Board
+  +₁°⊏≡°⊟⬚""↯∞_2
+  ⬚""/◇⊂₃@\n⍚$"_. _ _"
+)
+
 ⍢◌(&pf "[l]ocal or [o]nline? "
    ¬⊃∊˜⊗"lo"⊢&sc)
 ⨬GameMode~Local(
@@ -225,6 +231,8 @@ I~Loop!(
 
   HandlePastViewing
 
+  I~Key~Pressed‼@e(&p ExportPTN)
+
   ⍣(HandleWinState
   | HandleActivePlayer
   | HandleMultiplayerWait)
@@ -237,6 +245,4 @@ I~Loop!(
   DrawPastMessage
 )
 
-Board~PTNRecord GameState~Board
-+₁°⊏≡°⊟⬚""↯∞_2
-&p⬚""/◇⊂₃@\n⍚$"_. _ _"
+◌&p ExportPTN
