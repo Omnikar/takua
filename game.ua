@@ -14,6 +14,8 @@ Cap  ← 3
     NFlats
     # Capstones per player
     NCaps
+    # Portable Tak Notation log of the move history
+    PTNRecord ← {}
   }
   PieceCount ← ˜⊏[15_0 21_1 30_1 40_2 50_2]↥₀↧₄-₄
   # Create a new Board
@@ -124,6 +126,21 @@ Cap  ← 3
   | # If nothing else works, restart the move and try again
     ⨬(ClickSquare⊙⋅Uninit)◌ ≍Uninit⊸:
   )
+
+  # Format a move in Portable Tak Notation
+  Fmt ← (
+    FmtPos ← $"__"˜∩+@a1°⊟
+    Move!⍣(
+      ""°Uninit
+    | ⌵°Place
+      ⊂⊓⍣(
+        ""°Flat
+      | "S"°Wall
+      | "C"°Cap
+      )FmtPos
+    | ⊙𝄐⌟:°Move
+      /◇⊂{⊓(⍣(""°1)°⋕|FmtPos|˜⊏"+>-<"˜⊗A₂|⍣(""°1⧻|°⋕°⊥₁₀))})
+  )
 └─╴
 
 # Transform board state based on a move
@@ -142,13 +159,22 @@ Cap  ← 3
       ⊃⋅⋅∘⊙⍜⊙(°□⊡⊙Board~State)⊂)
     ⋅◌
     # Flatten walls
-    ⍜Board~State⍚₀⍜(⌵↘₁)↧₁
+    ⍜Board~State⍚₀⍜(⌵↘₁|↧Flat)
   )
   # Assert that a move is completely formed
   Validate ← °1⊸Move!⍣(0°Uninit|=/+Move!⊃Amnts Num|1)
   Call ← (
     Validate
-    ⊃⍣ProcessPlace ProcessMove⋅Board~State
+  
+    # PTN OldState Board ? Move Board
+    ⊃⊓Move~Fmt Board~State⍣ProcessPlace ProcessMove
+  
+    # Check if a wall was flattened, appending an asterisk to the PTN if so
+    ◡⋅⊙Board~State
+    /∨♭×˜∩=Wall Cap∩(⌵≡₀◇⬚0⊢)
+    ⤙⊙⊙◌ □⍥(˜⊂@*)
+  
+    ⍜Board~PTNRecord⊂
     ⍜Board~History⊂
   )
 └─╴

@@ -221,5 +221,6 @@ I~Loop!(
   DrawPastMessage
 )
 
-⊃GameState~GameMode(⊂Board!⊃History State GameState~Board)
-≡&s ⍥(⍥¯◿₂°⊏) ≍GameMode~Local
+Board~PTNRecord GameState~Board
++₁°⊏≡°⊟⬚""↯∞_2
+&p/◇⊂₃@\n⍚$"_. _ _"
