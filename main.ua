@@ -193,6 +193,22 @@ DrawPastMessage ← (
 )
 
 Board 5
+
+⍣(°□⊏1&args
+  ⍣(&rs ∞ 0 °"--stdin")&fras
+  Move~ParsePTN
+  ⤙⊙⊙∘
+  ⍣(GameMode~Online~MyColor
+    ⍥⍚⍣⍜Move~Place~Piece¯∘
+    ∧◇Process
+  | °GameMode~Local
+    ∧◇Process
+    ⍜Board~History(⍥¯◿₂°⊏)
+    ⊸Board~Turn
+    ⍥⍜Board~State¯
+  )
+| )
+
 Move
 
 I~Open WinSize "Tak"
@@ -223,4 +239,4 @@ I~Loop!(
 
 Board~PTNRecord GameState~Board
 +₁°⊏≡°⊟⬚""↯∞_2
-&p/◇⊂₃@\n⍚$"_. _ _"
+&p⬚""/◇⊂₃@\n⍚$"_. _ _"
