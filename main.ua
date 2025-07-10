@@ -97,6 +97,7 @@ HandleMoveSubmission ← ⍣(
   I~Key!Pressed‼(
     {Space @\n}
   | ⍣(◡⊙⋅(GameMode~Online~Tunnel GameState~GameMode)
+      NetMessage~MakeMove
       I~Net~Give
     | )
     Process
@@ -138,6 +139,7 @@ HandleMultiplayerWait ← (
   GameMode~Online~Tunnel
   Message₁ "Waiting for opponent..."
   I~Net~Get!(
+    °NetMessage~MakeMove
     °⊸GameState~Move
     ⍜⊃(GameState~Move|GameState~Board)(Move Process)
     RedrawScene
