@@ -111,20 +111,35 @@ Cap  ← 3
     °1≥/+⊸Move!⊃Amnts Num
   )
 
-  ClickSquare ← |3.2 ⍣(
-    # If a move hasn't been started yet
-    °Uninit :
-    # Check if the square is occupied
-    ⊡◡⊙Board~State
-    # If empty, start a place
-    # Otherwise, check that the active player
-    # controls this square and start a move
-    ⍣(Move 1 0_0 [] ⍩°1±◇⊢|ClickSquare⤙Place⋅0)
-  | SwitchPlacement
-  | PickUpPieces
-  | MovePieces
-  | # If nothing else works, restart the move and try again
-    ⨬(ClickSquare⊙⋅Uninit)◌ ≍Uninit⊸:
+  ClickSquare ← |3.2 (
+    # Change between positive representing player 1 and representing the active player
+    FlipPlayer₂ ← (
+      ◿₂◡⋅Board~Turn
+      ⍥⊓⍣⍜Place~Piece¯∘⍜Board~State¯
+    )
+
+    ⊙FlipPlayer₂
+
+    ⍣( # If a move hasn't been started yet
+      °Uninit :
+      # Check if the square is occupied
+      ⊡◡⊙Board~State
+      # If empty, start a place
+      # Otherwise, check that the active player
+      # controls this square and start a move
+      ⍣(Move 1 0_0 [] ⍩°1±◇⊢|Place⋅1)
+    | SwitchPlacement
+    | PickUpPieces
+    | MovePieces
+    | # If nothing else works, restart the move and try again
+      ⨬(ClickSquare⊙⋅Uninit)◌ ≍Uninit⊸:
+    )
+
+    # Opponents place each other's flats on the first two turns
+    <2◡⋅Board~Turn
+    ⍥⍣(°⊸Place~Piece¯1|⋅Uninit)
+
+    FlipPlayer₂
   )
 
   # Format a move in Portable Tak Notation

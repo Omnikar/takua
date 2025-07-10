@@ -51,13 +51,6 @@ RedrawScene ← (
 
   Scene
 
-  ⍣(◡⋅GameState~GameMode
-    ⍣(°GameMode~Local
-      °1◿₂↧Board~Turn◡⋅⊃GameState~Board GameState~PastView
-    | °1GameMode~Online~MyColor)
-    ⍜⊃Scene~Hover Scene~State∩¯
-  | )
-
   ∩⌟MkVoxels Scene~IdxsAndBuild ⊙⊸GameState~CamPos
   GameState!°⊸⊃(ClickMap|I~Texture~Image Texture)
 )
@@ -86,11 +79,6 @@ HandleBoardClick ← I~Mouse!Pressed‼Left(
     ⊏-₁
     Move~ClickSquare
   
-    # Opponents place each other's flats on the first two moves
-    ⍣(°1<2◡⋅Board~Turn
-      ⍣(°⊸Move~Place~Piece ¯1|⋅Move~Uninit⍜°Move~Move∘)
-    | )
-  
     °⊸⊃GameState~Move GameState~Board
     °⊸GameState~PastView ∞
     RedrawScene
@@ -104,13 +92,9 @@ HandleMoveSubmission ← ⍣(
   I~Key!Pressed‼(
     {Space @\n}
   | ⍣(◡⊙⋅(GameMode~Online~Tunnel GameState~GameMode)
-      I~Net~Give ⍣⍜Move~Place~Piece¯∘
+      I~Net~Give
     | )
     Process
-    ⍣(◡⋅GameState~GameMode
-      °GameMode~Local
-      ⍜Board~State¯
-    | )
     Move
   )
   °⊸⊃GameState~Move GameState~Board
@@ -156,11 +140,8 @@ HandleMultiplayerWait ← (
 )
 
 DrawPieceCounters ← (
-  ⊸⊃(
-    GameState~GameMode
-  | ⊃GameState~Board GameState~PastView
-    Board!⊃(◿₂↧Turn|⍣(˜⊏History|State)|NFlats|NCaps))
-  ⍥¯ ⍣(⊓GameMode~Online~MyColor◌|◌)
+  ⊸⊃GameState~Board GameState~PastView
+  Board!⊃(⍣(˜⊏History|State)|NFlats|NCaps)
   ⟜¯
   ∩⌟₂(
     /◇⊂♭ ↥₀
@@ -202,17 +183,7 @@ Board 5
 
 ⍣(°□⊏1&args
   ⍣(&rs ∞ 0 °"--stdin")&fras
-  Move~ParsePTN
-  ⤙⊙⊙∘
-  ⍣(GameMode~Online~MyColor
-    ⍥⍚⍣⍜Move~Place~Piece¯∘
-    ∧◇Process
-  | °GameMode~Local
-    ∧◇Process
-    ⍜Board~History(⍥¯◿₂°⊏)
-    ⊸Board~Turn
-    ⍥⍜Board~State¯
-  )
+  ∧◇Process Move~ParsePTN
 | )
 
 Move
