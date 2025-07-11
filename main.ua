@@ -255,4 +255,6 @@ I~Loop!(
   DrawPastMessage
 )
 
-◌&p ExportPTN
+&p ExportPTN
+
+⍣(I~Net~End GameMode~Online~Tunnel GameState~GameMode|)
