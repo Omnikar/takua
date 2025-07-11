@@ -35,7 +35,7 @@ HollowChannel ← ×<6⁅FFTConvolve~Same↯˙↯3⋯4281360⊸±
 HollowModel   ← ⍜(⊣°⍉)HollowChannel
 
 BoardModel ← memo(
-  ⍜(×⊙-|⇡⁅)VoxelRes⊸⊃¯+BoardPadding
+  ⍜(×⊙-|⇡⁅)VoxelRes⊸⊸⊃¯+BoardPadding
   ⊃(×⊓⌟><⊃¯+÷₂BoardBorderWidth :
   | <÷₂BoardBorderWidth⌵-⊸⁅)
   ×⊓˙⊞×˙⊞↥
@@ -45,6 +45,19 @@ BoardModel ← memo(
   ⊚≥2/+°⍉<BoardTrimWidth
   ⍜⊡≡⋅BoardTrim
   ⍜°⍉⊂⊙1
+
+  # Coordinate labels
+  # TODO: Fix mirrored labels on the back of the board
+  CoordLabel ← (
+    ⟜layout⁅×VoxelRes BoardThickness
+    √≡↻¯⌊÷₂˜-⟜(⧻₁⤙⬚0↙˜⊟) VoxelRes
+  )
+  ⇌°⋕∩⌟+1@a⇡:
+  ≡⇌∩(⇌/≡⊂≡CoordLabel)
+  ∩(≡⌝↘⁅×VoxelRes BoardPadding)
+  ⊓˜⊟⊙(⬚1↙₄BoardBorders)
+  ⊙◌∧(⤸0_2⊸⍜⊙⍜°⍉-⬚0×)
+
   ApplyLighting
   HollowModel
 )
