@@ -11,4 +11,4 @@ Press the `-` and `=` keys to view past moves.
 
 A log of the game in [Portable Tak Notation (PTN)](https://ustak.org/portable-tak-notation) will be printed automatically on quit. A PTN log can be exported manually at any point by pressing the `E` key.  
 Past games can be reviewed and/or resumed from the middle by providing PTN input, either by passing a file path as a command line argument or passing `--stdin` and pasting the PTN into stdin.  
-If resuming a game from the middle in online mode, both players must load the same PTN.
+If resuming a game from the middle in online mode, the host loads the PTN.
