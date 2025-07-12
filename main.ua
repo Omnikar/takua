@@ -109,26 +109,22 @@ HandleMoveSubmission ← ⍣(
 HandleWinState ← (
   ⊸GameState~Board
   ⍣(⟜(°1⊸/↥Board~CheckRoadWin)
-    ⍣(◡⋅⋅GameState~GameMode◿₂Board~Turn
-      =GameMode~Online~MyColor
-    )⋅1
-    # Bias for the active player in case of a double road
-    ⍜⊏(+0.1)
-  | °1⊸/↥ Board~CheckFlatWin)
+    # Bias for the player that was just active in case of a double road
+    ⍜⊏(+0.1) ¬Board~ActivePlayer
+  | °1⊸/↥Board~CheckFlatWin)
   ⍣(Message₁ "Draw" °1_1
   | ⊢⍖
-    ⍣(◡⋅⊃GameState~GameMode GameState~Board
-      °GameMode~Local
-      ≠◿₂Board~Turn
-      {"White wins!" "Black wins!"}
-    | {"You win!" "You lose!"})
-    Message₁˜⊏)
+    ⍣(=GameMode~Online~MyColor◡⋅GameState~GameMode
+      {"You lose!" "You win!"}
+    | {"White wins!" "Black wins!"})
+    Message₁ ˜⊏
+  )
 )
 
 HandleActivePlayer ← (
   ⊸GameState~GameMode
   ⍣°GameMode~Local(
-    ◌°.◿₂Board~Turn◡⋅GameState~Board GameMode~Online~MyColor
+    ◌°.Board~ActivePlayer◡⋅GameState~Board GameMode~Online~MyColor
   )
   HandleBoardClick
   HandleMoveSubmission

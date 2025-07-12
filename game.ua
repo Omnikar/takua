@@ -22,7 +22,8 @@ Cap  ← 3
   # Board ? Size
   Call ← New⊃(˜↯{}[0.]|↯˜⟜↯□[]|°⊟PieceCount)
   # The index of the current turn
-  Turn ← ⧻History
+  Turn         ← ⧻History
+  ActivePlayer ← ◿₂Turn
   # Check for a winning state by completed road for both players
   CheckRoadWin ← ⊟∩(
     𝄐⌟:⊸⍉↯⊸⧻+×2⊸⇌=₀°⊏
@@ -111,15 +112,7 @@ Cap  ← 3
     °1≥/+⊸Move!⊃Amnts Num
   )
 
-  ClickSquare ← |3.2 (
-    # Change between positive representing player 1 and representing the active player
-    FlipPlayer₂ ← (
-      ◿₂◡⋅Board~Turn
-      ⍥⊓⍣⍜Place~Piece¯∘⍜Board~State¯
-    )
-
-    ⊙FlipPlayer₂
-
+  ClickSquareImpl ↚ |3.2 (
     ⍣( # If a move hasn't been started yet
       °Uninit :
       # Check if the square is occupied
@@ -127,18 +120,28 @@ Cap  ← 3
       # If empty, start a place
       # Otherwise, check that the active player
       # controls this square and start a move
-      ⍣(Move 1 0_0 [] ⍩°1±◇⊢|Place⋅1)
+      ⍣(Move 1 0_0 [] ⍩°1±◇⊢|ClickSquareImpl⤙Place⋅0)
     | SwitchPlacement
     | PickUpPieces
     | MovePieces
     | # If nothing else works, restart the move and try again
-      ⨬(ClickSquare⊙⋅Uninit)◌ ≍Uninit⊸:
+      ⨬(ClickSquareImpl ⊙⋅Uninit)◌ ≍Uninit⊸:
     )
 
     # Opponents place each other's flats on the first two turns
     <2◡⋅Board~Turn
     ⍥⍣(°⊸Place~Piece¯1|⋅Uninit)
+  )
 
+  ClickSquare ← (
+    # Change between positive representing player 1 and representing the active player
+    FlipPlayer₂ ← (
+      ◡⋅Board~ActivePlayer
+      ⍥⊓⍣⍜Place~Piece¯∘⍜Board~State¯
+    )
+
+    ⊙FlipPlayer₂
+    ClickSquareImpl
     FlipPlayer₂
   )
 
