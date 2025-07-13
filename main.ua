@@ -163,18 +163,6 @@ HandleActivePlayer ← (
 HandleMultiplayerWait ← (
   ⊸GameState~GameMode
   GameMode~Online~Tunnel
-  Message₁ "Waiting for opponent..."
-  I~Net~Get!(
-    °NetMessage~MakeMove
-    °⊸GameState~Move
-    ⍜⊃(GameState~Move|GameState~Board)(Move Process)
-    RedrawScene
-  )
-)
-
-HandleMultiplayerWait ← (
-  ⊸GameState~GameMode
-  GameMode~Online~Tunnel
   I~Net~Get!⍣(
     °NetMessage~MakeMove
     °⊸GameState~Move
@@ -184,6 +172,34 @@ HandleMultiplayerWait ← (
     ⍜Chat~Message~Sender¬
     ⍜⊙(Chat~History GameMode~Online~Chat GameState~GameMode)⊂
   )
+)
+
+HandleChatInteraction ← (
+  I~Mouse~Pressed‼I~Mouse~Left⋅⍣(°⊸(Chat~Focused GameMode~Online~Chat GameState~GameMode)0|)
+
+  ⍣(GameMode~Online~Chat ⊸GameState~GameMode
+    °1 ⊸Chat~Focused
+    I~Key~Pressed @\n
+    ⨬(⍜Chat~Draft (▽⊸≠ @\t I~Key~Input)
+    | ⊸Chat~Draft
+      ±⊸⧻
+      ⨬◌(
+        Chat~Message 0 now
+        ⟜⍜⊙Chat~History⊂
+        NetMessage~ChatMessage
+        ⊙◡⋅(GameMode~Online~Tunnel GameState~GameMode)
+        I~Net~Give
+        °⊸Chat~Draft ""
+      )
+      °⊸Chat~Focused 0
+    )
+    °⊸(GameMode~Online~Chat GameState~GameMode)
+  | I~Key~Pressed‼@\n(°⊸(Chat~Focused GameMode~Online~Chat GameState~GameMode) 1)
+  | )
+
+  ⍣(I~Key~Pressed‼@\t⍜(Chat~Focused GameMode~Online~Chat GameState~GameMode)¬
+    Chat~Draw GameMode~Online~Chat⊸GameState~GameMode
+  | )
 )
 
 DrawPieceCounters ← (
@@ -286,31 +302,7 @@ I~Loop!(
 
   I~Key~Pressed‼@e(&p ExportPTN)
 
-  I~Mouse~Pressed‼I~Mouse~Left⋅⍣(°⊸(Chat~Focused GameMode~Online~Chat GameState~GameMode)0|)
-
-  ⍣(GameMode~Online~Chat ⊸GameState~GameMode
-    °1 ⊸Chat~Focused
-    I~Key~Pressed @\n
-    ⨬(⍜Chat~Draft (▽⊸≠ @\t I~Key~Input)
-    | ⊸Chat~Draft
-      ±⊸⧻
-      ⨬◌(
-        Chat~Message 0 now
-        ⟜⍜⊙Chat~History⊂
-        NetMessage~ChatMessage
-        ⊙◡⋅(GameMode~Online~Tunnel GameState~GameMode)
-        I~Net~Give
-        °⊸Chat~Draft ""
-      )
-      °⊸Chat~Focused 0
-    )
-    °⊸(GameMode~Online~Chat GameState~GameMode)
-  | I~Key~Pressed‼@\n(°⊸(Chat~Focused GameMode~Online~Chat GameState~GameMode) 1)
-  | )
-
-  ⍣(I~Key~Pressed‼@\t⍜(Chat~Focused GameMode~Online~Chat GameState~GameMode)¬
-    Chat~Draw GameMode~Online~Chat⊸GameState~GameMode
-  | )
+  HandleChatInteraction
 
   ⍣(HandleWinState
   | ⍣(CheckActivePlayer|Message₁ "Waiting for opponent...")
