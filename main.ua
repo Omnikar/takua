@@ -22,11 +22,37 @@ MkVoxels ← ▽₂⊢÷△₂⊸⊙WinSize voxels (Scale:VoxelScale) ⊙(Camera
 Message₁ ← I~Draw~Text White 30 100_100
 Message₂ ← I~Draw~Text White 30 100_140
 
+┌─╴Chat
+  ┌─╴Message
+    ~ {Sender Time Content}
+    Fmt ← ⊂ ⨬⋅""⨬"You: " "Them: " ±⊃(Time|Sender|Content)
+  └─╴
+
+  ~ {
+    History ← °△⊟0⧻Message~Fields
+    Draft ← ""
+    Focused ← 0
+  }
+  Size ← 20
+  Draw ← ⟜↓(
+    History
+  | ⊂Message .0 ˜⊂@_Draft
+    ≡⊟30 ˜-⊣WinSize +40 ×Size°⊏
+  | ¬Focused
+    ⨬1(˜-now◡⋅≡Message~Time
+       ¬↥0÷4-8 ∩₃⌞▽⊸<12
+    )
+    ⊙⊙⍚Message~Fmt
+    I~Draw~Text ≡⌞⊂White ⊙Size
+  )
+└─╴
+
 ┌─╴GameMode
   |Local
   |Online {
     MyColor
     Tunnel
+    Chat ← Chat
   }
 └─╴
 
@@ -45,6 +71,7 @@ Message₂ ← I~Draw~Text White 30 100_140
   |JoinRequest {MyPort}
   |JoinAccept {BoardSize YourColor PTN}
   |MakeMove {Move}
+  |ChatMessage {Message}
 └─╴
 
 RedrawScene ← (
@@ -94,9 +121,8 @@ HandleMoveSubmission ← ⍣(
   ⊸⊃GameState~Move GameState~Board
   Process~Validate
   I~Draw~Text White 40 -50_60 WinSize ">"
-  I~Key!Pressed‼(
-    {Space @\n}
-  | ⍣(◡⊙⋅(GameMode~Online~Tunnel GameState~GameMode)
+  I~Key!Pressed‼Space(
+    ⍣(◡⊙⋅(GameMode~Online~Tunnel GameState~GameMode)
       NetMessage~MakeMove
       I~Net~Give
     | )
@@ -121,11 +147,15 @@ HandleWinState ← (
   )
 )
 
-HandleActivePlayer ← (
+CheckActivePlayer ← (
   ⊸GameState~GameMode
   ⍣°GameMode~Local(
     ◌°.Board~ActivePlayer◡⋅GameState~Board GameMode~Online~MyColor
   )
+)
+
+HandleActivePlayer ← (
+  CheckActivePlayer
   HandleBoardClick
   HandleMoveSubmission
 )
@@ -139,6 +169,20 @@ HandleMultiplayerWait ← (
     °⊸GameState~Move
     ⍜⊃(GameState~Move|GameState~Board)(Move Process)
     RedrawScene
+  )
+)
+
+HandleMultiplayerWait ← (
+  ⊸GameState~GameMode
+  GameMode~Online~Tunnel
+  I~Net~Get!⍣(
+    °NetMessage~MakeMove
+    °⊸GameState~Move
+    ⍜⊃(GameState~Move|GameState~Board)(Move Process)
+    RedrawScene
+  | °NetMessage~ChatMessage
+    ⍜Chat~Message~Sender¬
+    ⍜⊙(Chat~History GameMode~Online~Chat GameState~GameMode)⊂
   )
 )
 
@@ -233,18 +277,48 @@ GameState
 RedrawScene
 
 I~Loop!(
+  I~Draw~Background ↯4 0
+  I~Draw~Background ⊸GameState~Texture
+
   HandleCamRotation
 
   HandlePastViewing
 
   I~Key~Pressed‼@e(&p ExportPTN)
 
-  ⍣(HandleWinState
-  | HandleActivePlayer
-  | HandleMultiplayerWait)
+  I~Mouse~Pressed‼I~Mouse~Left⋅⍣(°⊸(Chat~Focused GameMode~Online~Chat GameState~GameMode)0|)
 
-  I~Draw~Background ↯4 0
-  I~Draw~Background ⊸GameState~Texture
+  ⍣(GameMode~Online~Chat ⊸GameState~GameMode
+    °1 ⊸Chat~Focused
+    I~Key~Pressed @\n
+    ⨬(⍜Chat~Draft (▽⊸≠ @\t I~Key~Input)
+    | ⊸Chat~Draft
+      ±⊸⧻
+      ⨬◌(
+        Chat~Message 0 now
+        ⟜⍜⊙Chat~History⊂
+        NetMessage~ChatMessage
+        ⊙◡⋅(GameMode~Online~Tunnel GameState~GameMode)
+        I~Net~Give
+        °⊸Chat~Draft ""
+      )
+      °⊸Chat~Focused 0
+    )
+    °⊸(GameMode~Online~Chat GameState~GameMode)
+  | I~Key~Pressed‼@\n(°⊸(Chat~Focused GameMode~Online~Chat GameState~GameMode) 1)
+  | )
+
+  ⍣(I~Key~Pressed‼@\t⍜(Chat~Focused GameMode~Online~Chat GameState~GameMode)¬
+    Chat~Draw GameMode~Online~Chat⊸GameState~GameMode
+  | )
+
+  ⍣(HandleWinState
+  | ⍣(CheckActivePlayer|Message₁ "Waiting for opponent...")
+    °0 ⍣(Chat~Focused GameMode~Online~Chat⊸GameState~GameMode)0
+    HandleActivePlayer
+  | )
+
+  ⍣(HandleMultiplayerWait|)
 
   DrawPieceCounters
 
