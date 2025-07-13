@@ -319,4 +319,6 @@ I~Loop!(
 
 &p ExportPTN
 
-⍣(I~Net~End GameMode~Online~Tunnel GameState~GameMode|)
+⟜↓(
+  I~Texture~Unload GameState~Texture
+| ⍣(I~Net~End GameMode~Online~Tunnel GameState~GameMode|))
