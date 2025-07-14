@@ -226,6 +226,11 @@ DrawPastMessage ← (
      Message₂ $"_ move_ ago")
 )
 
+DrawBeginningMessage = (
+  <2 Board~Turn byGameState~Board
+  rep(Message,1 "Place your opponent's piece")
+)
+
 ExportPTN ← (
   Board~PTNRecord⊸GameState~Board
   +₁°⊏≡°⊟⬚""↯∞_2
@@ -307,7 +312,9 @@ I~Loop!(
   HandleChatInteraction
 
   ⍣(HandleWinState
-  | ⍣(CheckActivePlayer|Message₁ "Waiting for opponent...")
+  | ⍣(CheckActivePlayer
+      DrawBeginningMessage
+      |Message₁ "Waiting for opponent...")
     °0 ⍣(Chat~Focused GameMode~Online~Chat⊸GameState~GameMode)0
     HandleActivePlayer
   | )
