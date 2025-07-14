@@ -90,7 +90,7 @@ RedrawScene ← (
 HandleCamRotation ← (
   ⊸≠₀/+I~Key~ULDR 0
   ⨬◌(×I~Window~Dt⊟¯°ℂ
-     ⍜⊙GameState~CamPos-
+     ⍜⊙GameState~CamPos(⍜°⊟⊓(◿τ|↥0.08↧-0.08 π)-)
      RedrawScene)
 )
 
@@ -226,9 +226,9 @@ DrawPastMessage ← (
      Message₂ $"_ move_ ago")
 )
 
-DrawBeginningMessage = (
-  <2 Board~Turn byGameState~Board
-  rep(Message,1 "Place your opponent's piece")
+DrawBeginningMessage ← (
+  <2 Board~Turn⊸GameState~Board
+  ⍥(Message₁ "Place your opponent's piece")
 )
 
 ExportPTN ← (
@@ -314,7 +314,7 @@ I~Loop!(
   ⍣(HandleWinState
   | ⍣(CheckActivePlayer
       DrawBeginningMessage
-      |Message₁ "Waiting for opponent...")
+    | Message₁ "Waiting for opponent...")
     °0 ⍣(Chat~Focused GameMode~Online~Chat⊸GameState~GameMode)0
     HandleActivePlayer
   | )
