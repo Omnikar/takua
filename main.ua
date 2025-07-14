@@ -138,7 +138,9 @@ HandleWinState ← (
     # Bias for the player that was just active in case of a double road
     ⍜⊏(+0.1) ¬Board~ActivePlayer
   | °1⊸/↥Board~CheckFlatWin)
-  ⍣(Message₁ "Draw" °1_1
+  # Don't draw the game end message if viewing a past move
+  ⍣(°1≠∞⋅⊸GameState~PastView
+  | Message₁ "Draw" °1_1
   | ⊢⍖
     ⍣(=GameMode~Online~MyColor◡⋅GameState~GameMode
       {"You lose!" "You win!"}
