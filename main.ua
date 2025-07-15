@@ -40,8 +40,7 @@ Message₂ ← I~Draw~Text White 30 100_140
     ≡⊟30 ˜-⊣WinSize +40 ×Size°⊏
   | ¬Focused
     ⨬1(˜-now◡⋅≡Message~Time
-       ¬↥0÷4-8 ∩₃⌞▽⊸<12
-    )
+       ¬↥0÷4-8 ∩₃⌞▽⊸<12)
     ⊙⊙⍚Message~Fmt
     I~Draw~Text ≡⌞⊂White ⊙Size
   )
