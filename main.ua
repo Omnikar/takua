@@ -69,6 +69,7 @@ Message₂ ← I~Draw~Text White 30 100_140
 ┌─╴NetMessage
   |JoinRequest {MyPort}
   |JoinAccept {BoardSize YourColor PTN}
+  |JoinReject
   |MakeMove {Move}
   |ChatMessage {Message}
 └─╴
@@ -172,6 +173,10 @@ HandleMultiplayerWait ← (
   | °NetMessage~ChatMessage
     ⍜Chat~Message~Sender¬
     ⍜⊙(Chat~History GameMode~Online~Chat GameState~GameMode)⊂
+  | °NetMessage~JoinRequest
+    I~Net~Connect⊙(I~Net~Start LocalPort:+⚂₁₀₀ 8080)
+    ⊸I~Net~Give NetMessage~JoinReject
+    I~Net~End
   )
 )
 
@@ -277,13 +282,20 @@ LoadPTN ← (memo⍣(
     I~Net~Port⤙I~Net~Connect
     NetMessage~JoinRequest
     ⊸I~Net~Give
+    &p "Connecting..."
     ⟜(I~Net~Get Block:1)
+    ⍣(⊙⊸°NetMessage~JoinReject
+      &p "That game has already been joined!"
+      ⊸I~Net~End
+      &exit 1
+    | )
     ⊙NetMessage~JoinAccept!⟜↓(
       Board BoardSize
     | ∧◇Process PTN
     | YourColor
     )
     :˜GameMode~Online
+    &p "Connected"
   )
 )
 
