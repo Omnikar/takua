@@ -96,11 +96,15 @@ HandleCamRotation ← (
 
 HandlePastViewing ← (
   ⊸⌵-∩I~Key~Pressed @- @=
-  ⨬◌(⊙(⊸⊃GameState~PastView(Board~Turn GameState~Board)
-       ⍥⋅.⊸=∞)
-     ⍥⋅∞⤚≤↥₀+
-     °⊸GameState~PastView
-     RedrawScene)
+  ⨬◌(
+    ⊙(⊸⊃GameState~PastView(Board~Turn GameState~Board)
+      ⍥⋅.⊸=∞)
+    I~Key!(∨∩Down LeftShift RightShift)
+    ⨬+(𝄐⨬0 ∞↥₀)
+    ⍥⋅∞⤚≤↥₀
+    °⊸GameState~PastView
+    RedrawScene
+  )
 )
 
 HandleBoardClick ← I~Mouse!Pressed‼Left(
