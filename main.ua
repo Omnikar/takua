@@ -55,13 +55,15 @@ Message₂ ← I~Draw~Text White 30 100_140
   }
 └─╴
 
+DefaultCamPos ← [5π/4 ∠√2 1]
+
 ~GameState {
   ClickMap
   Texture
   Move
   Board
   GameMode
-  CamPos ← [5π/4 ∠√2 1]
+  CamPos ← DefaultCamPos
   # Turn to view; ∞ means present
   PastView ← ∞
 }
@@ -92,6 +94,11 @@ HandleCamRotation ← (
   ⨬◌(×I~Window~Dt⊟¯°ℂ
      ⍜⊙GameState~CamPos(⍜°⊟⊓(◿τ|↥0.08↧-0.08 π)-)
      RedrawScene)
+
+  I~Key~Pressed‼@r(
+    °⊸GameState~CamPos DefaultCamPos
+    RedrawScene
+  )
 )
 
 HandlePastViewing ← (

@@ -8,7 +8,7 @@ https://youtu.be/iEXkpS-Q9dI
 
 Press space to submit a move once it's been completed.
 
-Use the arrow keys to rotate the camera view.
+Use the arrow keys to rotate the camera view. Use the `R` key to reset the camera to its default position.
 
 Press the `-` and `=` keys to view past moves.
 Hold shift while pressing either of these keys to skip to the beginning or end of the game.
