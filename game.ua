@@ -17,7 +17,7 @@ Cap  ← 3
     # Portable Tak Notation log of the move history
     PTNRecord ← {}
   }
-  PieceCount ← ˜⊏[15_0 21_1 30_1 40_2 50_2]↥₀↧₄-₄
+  PieceCount ← ˜⊏[10_0 15_0 21_1 30_1 40_2 50_2]↥₀↧5-3
   # Create a new Board
   # Board ? Size
   Call ← New⊃(˜↯{}[0.]|↯˜⟜↯□[]|°⊟PieceCount)

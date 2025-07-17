@@ -254,7 +254,7 @@ ExportPTN ← (
 
 QueryBoardSize ← (
   &pf "Enter board size (5): "
-  ⍣(∩°1⊸⊃≥₄≤₈⋕)5 &sc
+  ⍣(∩°1⊸⊃≥₃≤₈⋕)5 &sc
 )
 
 QueryMyColor ← (
