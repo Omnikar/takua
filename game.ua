@@ -182,8 +182,8 @@ Cap  ← 3
 # Transform board state based on a move
 ┌─╴Process
   # Process a placement
-  ProcessPlace ← Move!(
-    Place!⊃Pos Piece
+  ProcessPlace ← (
+    Move~Place!⊃Pos Piece
     ˜⌟⍜(°□⊡⊙Board~State)⊂
   )
   # Process a movement

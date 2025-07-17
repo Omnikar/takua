@@ -80,7 +80,7 @@ RedrawScene ← (
   # If PastView is ∞, create a scene out of the present
   # Otherwise, make one out of the corresponding past state
   ⊸GameState~PastView
-  ⍣(⊸⊃GameState~Move GameState~Board °∞
+  ⍣(GameState!⊸⊃Move Board °∞
   | Move°⊸Board~State⊏⊙(⊸Board~History⊸GameState~Board))
 
   Scene
@@ -118,18 +118,18 @@ HandleBoardClick ← I~Mouse!Pressed‼Left(
   ⊙⊸GameState~ClickMap
   ⊸±⊡⌊×◡⋅△÷WinSize˜⊟°ℂ
   ⨬◌(
-    ⊙⊸⊃(♭₂⇡△◡⋅Board~State ⊃GameState~Move GameState~Board)
+    ⊙⊸⊃(♭₂⇡△◡⋅Board~State GameState!⊃Move Board)
     ⊏-₁
     Move~ClickSquare
   
-    °⊸⊃GameState~Move GameState~Board
+    GameState!°⊸⊃Move Board
     °⊸GameState~PastView ∞
     RedrawScene
   )
 )
 
 HandleMoveSubmission ← ⍣(
-  ⊸⊃GameState~Move GameState~Board
+  GameState!⊸⊃Move Board
   Process~Validate
   I~Draw~Text White 40 -50_60 WinSize ">"
   I~Key!Pressed‼Space(
@@ -140,15 +140,16 @@ HandleMoveSubmission ← ⍣(
     Process
     Move
   )
-  °⊸⊃GameState~Move GameState~Board
+  GameState!°⊸⊃Move Board
 | )
 
 HandleWinState ← (
   ⊸GameState~Board
-  ⍣(⟜(°1⊸/↥Board~CheckRoadWin)
+  Board!⍣(
+    ⟜(°1⊸/↥CheckRoadWin)
     # Bias for the player that was just active in case of a double road
-    ⍜⊏(+0.1) ¬Board~ActivePlayer
-  | °1⊸/↥Board~CheckFlatWin)
+    ⍜⊏(+0.1) ¬ActivePlayer
+  | °1⊸/↥CheckFlatWin)
   # Don't draw the game end message if viewing a past move
   ⍣(°1≠∞⋅⊸GameState~PastView
   | Message₁ "Draw" °1_1
@@ -179,7 +180,7 @@ HandleMultiplayerWait ← (
   I~Net~Get!⍣(
     °NetMessage~MakeMove
     °⊸GameState~Move
-    ⍜⊃(GameState~Move|GameState~Board)(Move Process)
+    ⍜GameState!⊃Move Board(Move Process)
     RedrawScene
   | °NetMessage~ChatMessage
     ⍜Chat~Message~Sender¬
@@ -192,7 +193,7 @@ HandleMultiplayerWait ← (
 )
 
 HandleChatInteraction ← (
-  I~Mouse~Pressed‼I~Mouse~Left⋅⍣(°⊸(Chat~Focused GameMode~Online~Chat GameState~GameMode)0|)
+  I~Mouse!Pressed‼Left⋅⍣(°⊸(Chat~Focused GameMode~Online~Chat GameState~GameMode)0|)
 
   ⍣(GameMode~Online~Chat ⊸GameState~GameMode
     °1 ⊸Chat~Focused
@@ -220,7 +221,7 @@ HandleChatInteraction ← (
 )
 
 DrawPieceCounters ← (
-  ⊸⊃GameState~Board GameState~PastView
+  GameState!⊸⊃Board PastView
   Board!⊃(⍣(˜⊏History|State)|NFlats|NCaps)
   ⟜¯
   ∩⌟₂(
@@ -237,7 +238,6 @@ DrawPieceCounters ← (
 DrawPastMessage ← (
   ⊸±-⊸↧⊸⊃GameState~PastView(Board~Turn GameState~Board)
   ⨬◌(⟜(⨬""@s>1)
-     # TODO: Fix this overlapping with "Waiting for opponent..."
      Message₂ $"_ move_ ago")
 )
 
