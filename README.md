@@ -1,7 +1,10 @@
 ![Screenshot of the game](screenshot.png)
 
 # Takua
-Uiua implementation of the abstract strategy game Tak (WIP)
+Uiua implementation of the abstract strategy game Tak
+
+See the following video for a tutorial on how to play Tak.  
+https://youtu.be/iEXkpS-Q9dI
 
 Press space to submit a move once it's been completed.
 
