@@ -1,7 +1,7 @@
 # Experimental!
 I ~ "git: github.com/Marcos-cat/iris"
 ~ "game"
-  ~ Board Move Process
+  ~ Board Action Process
   ~ Cap Flat Wall
 ~ "render"
   ~ Player₁ Player₂
@@ -60,7 +60,7 @@ DefaultCamPos ← [5π/4 ∠√2 1]
 ~GameState {
   ClickMap
   Texture
-  Move
+  Action
   Board
   GameMode
   CamPos ← DefaultCamPos
@@ -72,7 +72,7 @@ DefaultCamPos ← [5π/4 ∠√2 1]
   |JoinRequest {MyPort}
   |JoinAccept {BoardSize YourColor PTN}
   |JoinReject
-  |MakeMove {Move}
+  |DoAction {Action}
   |ChatMessage {Message}
 └─╴
 
@@ -80,8 +80,8 @@ RedrawScene ← (
   # If PastView is ∞, create a scene out of the present
   # Otherwise, make one out of the corresponding past state
   ⊸GameState~PastView
-  ⍣(GameState!⊸⊃Move Board °∞
-  | Move°⊸Board~State⊏⊙(⊸Board~History⊸GameState~Board))
+  ⍣(GameState!⊸⊃Action Board °∞
+  | Action°⊸Board~State⊏⊙(⊸Board~History⊸GameState~Board))
 
   Scene
 
@@ -118,29 +118,29 @@ HandleBoardClick ← I~Mouse!Pressed‼Left(
   ⊙⊸GameState~ClickMap
   ⊸±⊡⌊×◡⋅△÷WinSize˜⊟°ℂ
   ⨬◌(
-    ⊙⊸⊃(♭₂⇡△◡⋅Board~State GameState!⊃Move Board)
+    ⊙⊸⊃(♭₂⇡△◡⋅Board~State GameState!⊃Action Board)
     ⊏-₁
-    Move~ClickSquare
+    Action~ClickSquare
   
-    GameState!°⊸⊃Move Board
+    GameState!°⊸⊃Action Board
     °⊸GameState~PastView ∞
     RedrawScene
   )
 )
 
-HandleMoveSubmission ← ⍣(
-  GameState!⊸⊃Move Board
+HandleActionSubmission ← ⍣(
+  GameState!⊸⊃Action Board
   Process~Validate
   I~Draw~Text White 40 -50_60 WinSize ">"
   I~Key!Pressed‼Space(
     ⍣(◡⊙⋅(GameMode~Online~Tunnel GameState~GameMode)
-      NetMessage~MakeMove
+      NetMessage~DoAction
       I~Net~Give
     | )
     Process
-    Move
+    Action
   )
-  GameState!°⊸⊃Move Board
+  GameState!°⊸⊃Action Board
 | )
 
 HandleWinState ← (
@@ -171,16 +171,16 @@ CheckActivePlayer ← (
 HandleActivePlayer ← (
   CheckActivePlayer
   HandleBoardClick
-  HandleMoveSubmission
+  HandleActionSubmission
 )
 
 HandleMultiplayerWait ← (
   ⊸GameState~GameMode
   GameMode~Online~Tunnel
   I~Net~Get!⍣(
-    °NetMessage~MakeMove
-    °⊸GameState~Move
-    ⍜GameState!⊃Move Board(Move Process)
+    °NetMessage~DoAction
+    °⊸GameState~Action
+    ⍜GameState!⊃Action Board(Action Process)
     RedrawScene
   | °NetMessage~ChatMessage
     ⍜Chat~Message~Sender¬
@@ -265,7 +265,7 @@ QueryMyColor ← (
 LoadPTN ← (memo⍣(
     °□⊏1&args
     ⍣(&rs ∞ 0 &p"Enter PTN:" °"--stdin")&fras
-    Move~ParsePTN
+    Action~ParsePTN
   ){})
 
 ⍢◌(&pf "[l]ocal or [o]nline? "
@@ -310,7 +310,7 @@ LoadPTN ← (memo⍣(
   )
 )
 
-Move
+Action
 
 I~Open WinSize "Tak"
 I~Window!°FPS 30

@@ -2,7 +2,7 @@
 ~ "git: github.com/Omnikar/uiua-math" ~ BoxMuller FFTConvolve
 
 ~ "game"
-  ~ Board Move Process
+  ~ Action Board Process
   ~ Cap Flat Wall
 
 T‼ ← &p $"_ took _" ^0 ⍜now^1
@@ -121,9 +121,9 @@ PlacePieces ← ∧(PlaceModel⊙⨬(FlatModel|WallModel|CapModel))⊙(-₁⊃�
     State
   }
 
-  # ? Move Board
+  # ? Action Board
   Call ← (
-    New Move!⍣(
+    New Action!⍣(
       0_0 [] ⊓°Uninit Board~State
     | # :¤⊓°Place Board~State
       0_0 [] ⍜⊙(°□⊡)⊂⊓°Place Board~State

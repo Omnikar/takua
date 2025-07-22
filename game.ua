@@ -40,7 +40,7 @@ Cap  ← 3
   )
 └─╴
 
-┌─╴Move
+┌─╴Action
   # New move that has not been built yet
   |Uninit
   # Place a new piece on the board
@@ -166,7 +166,7 @@ Cap  ← 3
     )
   )
 
-  # Moves ? PTNString
+  # Actions ? PTNString
   ParsePTN ← (
     # Strip metadata
     ⍢∘⍣(1◌°$"[_]\n_")0
@@ -183,11 +183,11 @@ Cap  ← 3
 ┌─╴Process
   # Process a placement
   ProcessPlace ← (
-    Move~Place!⊃Pos Piece
+    Action~Place!⊃Pos Piece
     ˜⌟⍜(°□⊡⊙Board~State)⊂
   )
   # Process a movement
-  ProcessMove ← Move~Move!⟜↓(
+  ProcessMove ← Action~Move!⟜↓(
     ⊃Num Orig
     ⍜⊙⊙(°□⊡|Board~State)⊃↙↘
   | ⊃(⇌Amnts|¤Dir|Orig)
@@ -198,12 +198,12 @@ Cap  ← 3
     ⍜Board~State⍚₀⍜(⌵↘₁|↧Flat)
   )
   # Assert that a move is completely formed
-  Validate ← °1⊸Move!⍣(0°Uninit|=/+Move!⊃Amnts Num|1)
+  Validate ← °1⊸Action!⍣(0°Uninit|=/+Move!⊃Amnts Num|1)
   Call ← (
     Validate
   
-    # PTN OldState Board ? Move Board
-    ⊃⊓Move~Fmt Board~State⍣ProcessPlace ProcessMove
+    # PTN OldState Board ? Action Board
+    ⊃⊓Action~Fmt Board~State⍣ProcessPlace ProcessMove
   
     # Check if a wall was flattened, appending an asterisk to the PTN if so
     ◡⋅⊙Board~State
