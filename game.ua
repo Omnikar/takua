@@ -135,14 +135,12 @@ Cap  ← 3
 
   ClickSquare ← (
     # Change between positive representing player 1 and representing the active player
-    FlipPlayer₂ ← (
+    FlipPlayer₂ ← (⌅(^0|^0))!(
       ◡⋅Board~ActivePlayer
       ⍥⊓⍣⍜Place~Piece¯∘⍜Board~State¯
     )
 
-    ⊙FlipPlayer₂
-    ClickSquareImpl
-    FlipPlayer₂
+    ⍜⊙FlipPlayer₂ ClickSquareImpl
   )
 
   # Format a move in Portable Tak Notation
