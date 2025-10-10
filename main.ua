@@ -1,7 +1,7 @@
 # Experimental!
 I ~ "git: github.com/Marcos-cat/iris"
 ~ "game"
-  ~ Board Action Process
+  ~ Action Board Process
   ~ Cap Flat Wall
 ~ "render"
   ~ Player₁ Player₂
@@ -18,7 +18,7 @@ SphToRect ← ˜⊂×⍜°⊟∩°∠
 
 # Render voxels and rescale to screen size
 # ? Voxels CamPos
-MkVoxels ← ▽₂⊢÷△₂⊸⊙WinSize voxels (Scale:VoxelScale) ⊙(Camera:SphToRect)
+MkVoxels ← ▽₂⊢÷△₂⊸⊙WinSize voxels!°⊸⊃Scale Camera VoxelScale SphToRect :
 Message₁ ← I~Draw~Text White 30 100_100
 Message₂ ← I~Draw~Text White 30 100_140
 
@@ -186,7 +186,7 @@ HandleMultiplayerWait ← (
     ⍜Chat~Message~Sender¬
     ⍜⊙(Chat~History GameMode~Online~Chat GameState~GameMode)⊂
   | °NetMessage~JoinRequest
-    I~Net~Connect⊙(I~Net~Start LocalPort:+⚂₁₀₀ 8080)
+    I~Net~Connect⊙(I~Net~Start!°⊸LocalPort +⚂₁₀₀ 8080)
     ⊸I~Net~Give NetMessage~JoinReject
     I~Net~End
   )
@@ -269,12 +269,12 @@ LoadPTN ← (memo⍣(
   ){})
 
 ⍢◌(&pf "[l]ocal or [o]nline? "
-   ¬⊃∊˜⊗"lo"⬚@.⊢&sc)
+   ¬⊃∊⨂"lo"⬚@.⊢&sc)
 ⨬(Board QueryBoardSize GameMode~Local
   ∧◇Process LoadPTN
-| I~Net~Start LocalPort:+⚂₁₀₀ 8080
+| I~Net~Start!°⊸LocalPort +⚂₁₀₀ 8080
   ⍢◌(&pf "[h]ost or [j]oin? "
-     ¬⊃∊˜⊗"hj"⬚@.⊢&sc)
+     ¬⊃∊⨂"hj"⬚@.⊢&sc)
   ⨬(⊙(:LoadPTN QueryMyColor QueryBoardSize)
     ⊸I~Net~Port
     &p $"Your code is _" Code
@@ -283,7 +283,7 @@ LoadPTN ← (memo⍣(
     :⊙↓(
       Board
     | | ∧◇Process
-    | °NetMessage~JoinRequest⊸(I~Net~Get Block:1)
+    | °NetMessage~JoinRequest⊸(I~Net~TryGet!°⊸Block1)
       &p "Connected"
       I~Net~Connect
     | ⊸I~Net~Give
@@ -294,7 +294,7 @@ LoadPTN ← (memo⍣(
     NetMessage~JoinRequest
     ⊸I~Net~Give
     &p "Connecting..."
-    ⟜(I~Net~Get Block:1)
+    ⟜(I~Net~TryGet!°⊸Block1)
     ⍣(⊙⊸°NetMessage~JoinReject
       &p "That game has already been joined!"
       ⊸I~Net~End
