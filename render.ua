@@ -72,7 +72,7 @@ BoardIdxModel ← memo(
 
 RawFlatModel ← (
   ⊸△˜⊏Player₂_Player₁↥₀
-  ↯⊂⁅×VoxelRes[FlatThickness.FlatWidth]
+  ↯⊂⁅×VoxelRes[FlatThickness ⟜∘ FlatWidth]
   ⍜°⍉⊂⊙1
 )
 
@@ -131,7 +131,7 @@ PlacePieces ← ∧(PlaceModel⊙⨬(FlatModel|WallModel|CapModel))⊙(-₁⊃�
       | -/+⊃(Amnts|Num|Orig)
         ⍜⊙⊙(°□⊡|Board~State)⊃↙↘
       | °⊸Num/+⊸Amnts
-        𝄐⌟Process~ProcessMove
+        ∪⌟Process~ProcessMove∘
         :Board~State
       | +×⊃(⧻Amnts|Dir|Orig)
       )

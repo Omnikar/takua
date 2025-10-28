@@ -36,7 +36,7 @@ Message₂ ← I~Draw~Text White 30 100_140
   Size ← 20
   Draw ← ⟜↓(
     History
-  | ⊂Message .0 ˜⊂@_Draft
+  | ⊂Message 0 0 ˜⊂@_Draft
     ≡⊟30 ˜-⊣WinSize +40 ×Size°⊏
   | ¬Focused
     ⨬1(˜-now◡⋅≡Message~Time
@@ -105,9 +105,9 @@ HandlePastViewing ← (
   ⊸⌵-∩I~Key~Pressed @- @=
   ⨬◌(
     ⊙(⊸⊃GameState~PastView(Board~Turn GameState~Board)
-      ⍥⋅.⊸=∞)
+      ⍥⋅⟜∘⊸=∞)
     I~Key!(∨∩Down LeftShift RightShift)
-    ⨬+(𝄐⨬0 ∞↥₀)
+    ⨬+(∪⨬0 ∞↥₀)
     ⍥⋅∞⤚≤↥₀
     °⊸GameState~PastView
     RedrawScene
@@ -164,7 +164,7 @@ HandleWinState ← (
 CheckActivePlayer ← (
   ⊸GameState~GameMode
   ⍣°GameMode~Local(
-    ◌°.Board~ActivePlayer◡⋅GameState~Board GameMode~Online~MyColor
+    ◌°⟜∘Board~ActivePlayer◡⋅GameState~Board GameMode~Online~MyColor
   )
 )
 
@@ -279,7 +279,7 @@ LoadPTN ← (memo⍣(
     ⊸I~Net~Port
     &p $"Your code is _" Code
     &p "Waiting for opponent to join..."
-    NetMessage~JoinAccept◡⋅(𝄐⌟:¬)
+    NetMessage~JoinAccept◡⋅(⤙⊙⊙◌¬)
     :⊙↓(
       Board
     | | ∧◇Process

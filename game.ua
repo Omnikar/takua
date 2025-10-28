@@ -20,13 +20,13 @@ Cap  ← 3
   PieceCount ← ˜⊏[10_0 15_0 21_1 30_1 40_2 50_2]↥₀↧5-3
   # Create a new Board
   # Board ? Size
-  Call ← New⊃(˜↯{}[0.]|↯˜⟜↯□[]|°⊟PieceCount)
+  Call ← New⊃(˜↯{}[0⟜∘]|↯˜⟜↯□[]|°⊟PieceCount)
   # The index of the current turn
   Turn         ← ⧻History
   ActivePlayer ← ◿₂Turn
   # Check for a winning state by completed road for both players
   CheckRoadWin ← ⊟∩(
-    𝄐⌟:⊸⍉↯⊸⧻+×2⊸⇌=₀°⊏
+    ⤙⊙⊙◌⊸⍉↯⊸⧻+×2⊸⇌=₀°⊏
     /∨=₃⊂⊜∩(/+◴)∊Flat_Cap≡₀◇⬚0⊢
   )⟜¯ State
   # Check for a flat win/draw when the board is filled or one player runs out of pieces
@@ -67,7 +67,7 @@ Cap  ← 3
     # If already placing and clicking on the same square,
     # increment the piece type to be placed
     ⍜(-₁°Place
-    | ⊙°.
+    | ⊙°⟜∘
       ◡⋅⋅Board!⊃(State|NFlats|NCaps)
       ˜∩>∩/+⊸¬=₃▽⊸±/◇⊂♭
       ⨬(-₁⋅Cap°1)⨬(◿₂+₁|◿₃+₁)
@@ -76,11 +76,11 @@ Cap  ← 3
 
   PickUpPieces ↚ Move!(
     # If moving and clicking on the origin square
-    °.◡⋅Orig
+    °⟜∘◡⋅Orig
     # And nowhere else has been clicked already
     °[]◡⋅Amnts
     # Min number of stones and carry limit
-    𝄐⌞(↧◇∩⧻⊸⊡⊙⊸Board~State)
+    ∪⌞∘(↧◇∩⧻⊸⊡⊙⊸Board~State)
     # Increment the number of stones being
     # carried and limit accordingly
     ⍜Num(↧+₁)
@@ -104,10 +104,10 @@ Cap  ← 3
     )
 
     ⍣(◡⋅Orig °0_0
-      𝄐⌞°⊸Dir ⍩°1⊸∊A₂⊸-
+      ∪⌞∘°⊸Dir ⍩°1⊸∊A₂⊸-
       TryMove
     | ⊙(⊸-+×⧻◡⋅⊃(Amnts|Dir|Orig))
-      ⍣(TryMove◌°.|⋅⍜(⊢Amnts)+₁⋅°0_0))
+      ⍣(TryMove◌°⟜∘|⋅⍜(⊢Amnts)+₁⋅°0_0))
 
     °1≥/+⊸Move!⊃Amnts Num
   )
@@ -153,11 +153,11 @@ Cap  ← 3
         | "S"°Wall
         | "C"°Cap
         )FmtPos
-      | ⊙𝄐⌟:°Move
+      | ⊙⤙⊙⊙◌°Move
         /◇⊂{⊓(⍣(""°1)°⋕|FmtPos|˜⊏"+>-<"⨂A₂|⍣(""°1⧻|°⋕°⊥₁₀))})
     | ⍣(↘₁⊢regex"([1-9]*)([a-h][1-8])([+>\\-<])([1-9]*).*?"
         ⬚1⋕°□₄
-        ⊃⊙⊓°FmtPos(˜⊡A₂⨂"+>-<")𝄐𝄐(⊥₁₀⬚∘⋕)
+        ⊃⊙⊓°FmtPos(˜⊡A₂⨂"+>-<")∪∪(⊥₁₀⬚∘⋕)
         Move⊙⤚⋅⊙∘
       | ↘₁⊢regex"([SC]?)([a-h][1-8]).*?"
         Place ⊓(+₁⨂"FSC"⬚@F⊢)°FmtPos °□₂)
