@@ -71,7 +71,7 @@ Cap  ← 3
       ◡⋅⋅Board!⊃(State|NFlats|NCaps)
       ˜∩>∩/+⊸¬=₃▽⊸±/◇⊂♭
       ⨬(-₁⋅Cap°1)⨬(◿₂+₁|◿₃+₁)
-    ):
+    )˜∘
   )
 
   PickUpPieces ↚ Move!(
@@ -114,7 +114,7 @@ Cap  ← 3
 
   ClickSquareImpl ↚ |3.2 (
     ⍣( # If a move hasn't been started yet
-      °Uninit :
+      °Uninit ˜∘
       # Check if the square is occupied
       ⊡◡⊙Board~State
       # If empty, start a place
@@ -125,7 +125,7 @@ Cap  ← 3
     | PickUpPieces
     | MovePieces
     | # If nothing else works, restart the move and try again
-      ⨬(ClickSquareImpl ⊙⋅Uninit)◌ ≍Uninit⊸:
+      ⨬(ClickSquareImpl ⊙⋅Uninit)◌ ≍Uninit ⤙⊙∘
     )
 
     # Opponents place each other's flats on the first two turns
@@ -171,7 +171,7 @@ Cap  ← 3
 
     ⊜□¬⊸∊" \n"
     ∩⌟▽⟜¬±◿₃°⊏
-    :⍚°Fmt
+    ˜∘⍚°Fmt
     ≠⟜(↙⧻)◿₂⇡◡⋅⧻▽2=□"1."
     ⍚⍥⍣⍜Place~Piece¯∘
   )
@@ -189,7 +189,7 @@ Cap  ← 3
     ⊃Num Orig
     ⍜⊙⊙(°□⊡|Board~State)⊃↙↘
   | ⊃(⇌Amnts|¤Dir|Orig)
-    ∧(⊃↘↙¯⊙:⊙+
+    ∧(∪⌟⊃↘↙∘¯⊙+
       ⊃⋅⋅∘⊙⍜⊙(°□⊡⊙Board~State)⊂)
     ⋅◌
     # Flatten walls

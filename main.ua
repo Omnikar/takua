@@ -18,7 +18,7 @@ SphToRect ← ˜⊂×⍜°⊟∩°∠
 
 # Render voxels and rescale to screen size
 # ? Voxels CamPos
-MkVoxels ← ▽₂⊢÷△₂⊸⊙WinSize voxels!°⊸⊃Scale Camera VoxelScale SphToRect :
+MkVoxels ← ▽₂⊢÷△₂⊸⊙WinSize voxels!°⊸⊃Scale Camera VoxelScale SphToRect ˜∘
 Message₁ ← I~Draw~Text White 30 100_100
 Message₂ ← I~Draw~Text White 30 100_140
 
@@ -275,12 +275,12 @@ LoadPTN ← (memo⍣(
 | I~Net~Start!°⊸LocalPort +⚂₁₀₀ 8080
   ⍢◌(&pf "[h]ost or [j]oin? "
      ¬⊃∊⨂"hj"⬚@.⊢&sc)
-  ⨬(⊙(:LoadPTN QueryMyColor QueryBoardSize)
+  ⨬(⊙(˜∘ LoadPTN QueryMyColor QueryBoardSize)
     ⊸I~Net~Port
     &p $"Your code is _" Code
     &p "Waiting for opponent to join..."
     NetMessage~JoinAccept◡⋅(⤙⊙⊙◌¬)
-    :⊙↓(
+    ˜∘⊙↓(
       Board
     | | ∧◇Process
     | °NetMessage~JoinRequest⊸(I~Net~TryGet!°⊸Block1)
@@ -305,7 +305,7 @@ LoadPTN ← (memo⍣(
     | ∧◇Process PTN
     | YourColor
     )
-    :˜GameMode~Online
+    ˜∘˜GameMode~Online
     &p "Connected"
   )
 )

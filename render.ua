@@ -36,7 +36,7 @@ HollowModel   ← ⍜(⊣°⍉)HollowChannel
 
 BoardModel ← memo(
   ⍜(×⊙-|⇡⁅)VoxelRes⊸⊸⊃¯+BoardPadding
-  ⊃(×⊓⌟><⊃¯+÷₂BoardBorderWidth :
+  ⊃(×⊓⌟><⊃¯+÷₂BoardBorderWidth ˜∘
   | <÷₂BoardBorderWidth⌵-⊸⁅)
   ×⊓˙⊞×˙⊞↥
   ˜⊏[BoardBase BoardBorders]
@@ -52,7 +52,7 @@ BoardModel ← memo(
     ⟜layout⁅×VoxelRes BoardThickness
     √≡↻¯⌊÷₂˜-⟜(⧻₁⤙⬚0↙˜⊟) VoxelRes
   )
-  ⇌°⋕∩⌟+1@a⇡:
+  ⇌°⋕∩⌟+1@a˜⇡
   ≡⇌∩(⇌/≡⊂≡CoordLabel)
   ∩(≡⌝↘⁅×VoxelRes BoardPadding)
   ⊓˜⊟⊙(⬚1↙₄BoardBorders)
@@ -105,7 +105,7 @@ PlaceModel ← (
   ⁅⍜°⊂⊓(
     ×VoxelRes+BoardThickness×FlatThickness
   | +÷₂-↘₁◡⋅⋅△₃⟜×VoxelRes+BoardPadding)
-  ⍜⊙(↙⊙↘)↥ ⊙⟜₂(⬚0⍜⊙△₃↥+) ⟜△₃:
+  ⍜⊙(↙⊙↘)↥ ⊙⟜₂(⬚0⍜⊙△₃↥+) ˜⟜△₃
 )
 
 # ? Coords Pieces Board
@@ -132,7 +132,7 @@ PlacePieces ← ∧(PlaceModel⊙⨬(FlatModel|WallModel|CapModel))⊙(-₁⊃�
         ⍜⊙⊙(°□⊡|Board~State)⊃↙↘
       | °⊸Num/+⊸Amnts
         ∪⌟Process~ProcessMove∘
-        :Board~State
+        ˜∘ Board~State
       | +×⊃(⧻Amnts|Dir|Orig)
       )
     )
@@ -149,7 +149,7 @@ PlacePieces ← ∧(PlaceModel⊙⨬(FlatModel|WallModel|CapModel))⊙(-₁⊃�
     # Draw hover pieces
     ⟜↓(
       °⊏⇌Hover
-    | :HoverPos
+    | ˜∘ HoverPos
     | ⊃HoverPos State
       ≡⌟⊂ +2+◇⧻⊡
       PlacePieces
