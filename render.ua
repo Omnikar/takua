@@ -47,16 +47,25 @@ BoardModel ← memo(
   ⍜°⍉⊂⊙1
 
   # Coordinate labels
-  # TODO: Fix mirrored labels on the back of the board
   CoordLabel ← (
     ⟜layout⁅×VoxelRes BoardThickness
     √≡↻¯⌊÷₂˜-⟜(⧻₁⤙⬚0↙˜⊟) VoxelRes
   )
   ⇌°⋕∩⌟+1@a˜⇡
-  ≡⇌∩(⇌/≡⊂≡CoordLabel)
-  ∩(≡⌝↘⁅×VoxelRes BoardPadding)
-  ⊓˜⊟⊙(⬚1↙₄BoardBorders)
-  ⊙◌∧(⤸0_2⊸⍜⊙⍜°⍉-⬚0×)
+
+  # ≡⇌∩(⇌/≡⊂≡CoordLabel)
+  # ∩(≡⌝↘⁅×VoxelRes BoardPadding)
+  # ⊓˜⊟⊙(⬚1↙₄BoardBorders)
+  # ⊙◌∧(⤸0_2⊸⍜⊙⍜°⍉-⬚0×)
+
+  # Solution for reversed coord labels on the back of the board
+  # It's kinda hacky
+  ◡∩⇌
+  ∩⌟(≡⇌∩(⇌/≡⊂≡CoordLabel)
+     ∩(≡⌝↘⁅×VoxelRes BoardPadding)
+     ⊓˜⊟⊙(⬚1↙₄BoardBorders)
+     ⊙◌∧(⤸0_2⊸⍜⊙⍜°⍉-⬚0×))
+  ⍜∩(↘¯ 1_1⍉)◌≡(⇌|⇌)
 
   ApplyLighting
   HollowModel
