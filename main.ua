@@ -104,7 +104,7 @@ HandleCamRotation ← (
 HandlePastViewing ← (
   ⊸⌵-∩I~Key~Pressed @- @=
   ⨬◌(
-    ⊙(⊸⊃GameState~PastView(Board~Turn GameState~Board)
+    ⊙(⊸⊃GameState~PastView GameState~Board≈Turn
       ⍥⋅⟜∘⊸=∞)
     I~Key!(∨∩Down LeftShift RightShift)
     ⨬+(∪⨬0 ∞↥₀)
@@ -133,7 +133,7 @@ HandleActionSubmission ← ⍣(
   Process~Validate
   I~Draw~Text White 40 -50_60 WinSize ">"
   I~Key!Pressed‼Space(
-    ⍣(◡⊙⋅(GameMode~Online~Tunnel GameState~GameMode)
+    ⍣(◡⊙⋅GameState~GameMode≈Online~Tunnel
       NetMessage~DoAction
       I~Net~Give
     | )
@@ -154,7 +154,7 @@ HandleWinState ← (
   ⍣(°1≠∞⋅⊸GameState~PastView
   | Message₁ "Draw" °1_1
   | ⊢⍖
-    ⍣(=GameMode~Online~MyColor◡⋅GameState~GameMode
+    ⍣(=◡⋅GameState~GameMode≈Online~MyColor
       {"You lose!" "You win!"}
     | {"White wins!" "Black wins!"})
     Message₁ ˜⊏
@@ -164,7 +164,7 @@ HandleWinState ← (
 CheckActivePlayer ← (
   ⊸GameState~GameMode
   ⍣°GameMode~Local(
-    ◌°⟜∘Board~ActivePlayer◡⋅GameState~Board GameMode~Online~MyColor
+    ◌°⟜∘◡⋅GameState~Board≈ActivePlayer GameMode~Online~MyColor
   )
 )
 
@@ -175,8 +175,7 @@ HandleActivePlayer ← (
 )
 
 HandleMultiplayerWait ← (
-  ⊸GameState~GameMode
-  GameMode~Online~Tunnel
+  ⊸GameState~GameMode≈Online~Tunnel
   I~Net~Get!⍣(
     °NetMessage~DoAction
     °⊸GameState~Action
@@ -184,7 +183,7 @@ HandleMultiplayerWait ← (
     RedrawScene
   | °NetMessage~ChatMessage
     ⍜Chat~Message~Sender¬
-    ⍜⊙(Chat~History GameMode~Online~Chat GameState~GameMode)⊂
+    ⍜⊙GameState~GameMode≈Online~Chat≈History⊂
   | °NetMessage~JoinRequest
     I~Net~Connect⊙(I~Net~Start!°⊸LocalPort +⚂₁₀₀ 8080)
     ⊸I~Net~Give NetMessage~JoinReject
@@ -193,9 +192,9 @@ HandleMultiplayerWait ← (
 )
 
 HandleChatInteraction ← (
-  I~Mouse!Pressed‼Left⋅⍣(°⊸(Chat~Focused GameMode~Online~Chat GameState~GameMode)0|)
+  I~Mouse!Pressed‼Left⋅⍣(°⊸GameState~GameMode≈Online~Chat≈Focused0|)
 
-  ⍣(GameMode~Online~Chat ⊸GameState~GameMode
+  ⍣(⊸GameState~GameMode≈Online~Chat
     °1 ⊸Chat~Focused
     I~Key~Pressed @\n
     ⨬(⍜Chat~Draft (▽⊸≠ @\t I~Key~Input)
@@ -205,18 +204,18 @@ HandleChatInteraction ← (
         Chat~Message 0 now
         ⟜⍜⊙Chat~History⊂
         NetMessage~ChatMessage
-        ⊙◡⋅(GameMode~Online~Tunnel GameState~GameMode)
+        ⊙◡⋅GameState~GameMode≈Online~Tunnel
         I~Net~Give
         °⊸Chat~Draft ""
       )
       °⊸Chat~Focused 0
     )
-    °⊸(GameMode~Online~Chat GameState~GameMode)
-  | I~Key~Pressed‼@\n(°⊸(Chat~Focused GameMode~Online~Chat GameState~GameMode) 1)
+    °⊸GameState~GameMode≈Online~Chat
+  | I~Key~Pressed‼@\n(°⊸GameState~GameMode≈Online~Chat≈Focused 1)
   | )
 
-  ⍣(I~Key~Pressed‼@\t⍜(Chat~Focused GameMode~Online~Chat GameState~GameMode)¬
-    Chat~Draw GameMode~Online~Chat⊸GameState~GameMode
+  ⍣(I~Key~Pressed‼@\t⍜GameState~GameMode≈Online~Chat≈Focused¬
+    ⊸GameState~GameMode≈Online~Chat≈Draw
   | )
 )
 
@@ -236,18 +235,18 @@ DrawPieceCounters ← (
 )
 
 DrawPastMessage ← (
-  ⊸±-⊸↧⊸⊃GameState~PastView(Board~Turn GameState~Board)
+  ⊸±-⊸↧⊸⊃GameState~PastView GameState~Board≈Turn
   ⨬◌(⟜(⨬""@s>1)
      Message₂ $"_ move_ ago")
 )
 
 DrawBeginningMessage ← (
-  <2 Board~Turn⊸GameState~Board
+  <2 ⊸GameState~Board≈Turn
   ⍥(Message₁ "Place your opponent's piece")
 )
 
 ExportPTN ← (
-  Board~PTNRecord⊸GameState~Board
+  ⊸GameState~Board≈PTNRecord
   +₁°⊏≡°⊟⬚""↯∞_2
   ⬚""/◇⊂₃@\n⍚$"_. _ _"
 )
@@ -337,7 +336,7 @@ I~Loop!(
   | ⍣(CheckActivePlayer
       DrawBeginningMessage
     | Message₁ "Waiting for opponent...")
-    °0 ⍣(Chat~Focused GameMode~Online~Chat⊸GameState~GameMode)0
+    °0 ⍣⊸GameState~GameMode≈Online~Chat≈Focused0
     HandleActivePlayer
   | )
 
@@ -352,4 +351,4 @@ I~Loop!(
 
 ⟜↓(
   I~Texture~Unload GameState~Texture
-| ⍣(I~Net~End GameMode~Online~Tunnel GameState~GameMode|))
+| ⍣(I~Net~End GameState~GameMode≈Online~Tunnel|))
