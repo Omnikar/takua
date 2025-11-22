@@ -58,6 +58,8 @@ Message₂ ← I~Draw~Text White 30 100_140
 DefaultCamPos ← [5π/4 ∠√2 1]
 
 ~GameState {
+  IdxVoxels
+  BoardVoxels
   ClickMap
   Texture
   Action
@@ -76,16 +78,19 @@ DefaultCamPos ← [5π/4 ∠√2 1]
   |ChatMessage {Message}
 └─╴
 
-RedrawScene ← (
+RebuildScene ← (
   # If PastView is ∞, create a scene out of the present
   # Otherwise, make one out of the corresponding past state
   ⊸GameState~PastView
   ⍣(GameState!⊸⊃Action Board °∞
   | Action°⊸Board~State⊏⊙(⊸Board~History⊸GameState~Board))
 
-  Scene
+  Scene≈IdxsAndBuild
+  GameState!°⊸⊃IdxVoxels BoardVoxels
+)
 
-  ∩⌟MkVoxels Scene~IdxsAndBuild ⊙⊸GameState~CamPos
+RedrawScene ← (
+  ∩⌟MkVoxels GameState!⊸⊃(IdxVoxels|BoardVoxels|CamPos)
   GameState!°⊸⊃(ClickMap|I~Texture~Image Texture)
 )
 
@@ -110,7 +115,7 @@ HandlePastViewing ← (
     ⨬+(∪⨬0 ∞↥₀)
     ⍥⋅∞⤚≤↥₀
     °⊸GameState~PastView
-    RedrawScene
+    RedrawScene RebuildScene
   )
 )
 
@@ -124,7 +129,7 @@ HandleBoardClick ← I~Mouse!Pressed‼Left(
   
     GameState!°⊸⊃Action Board
     °⊸GameState~PastView ∞
-    RedrawScene
+    RedrawScene RebuildScene
   )
 )
 
@@ -180,7 +185,7 @@ HandleMultiplayerWait ← (
     °NetMessage~DoAction
     °⊸GameState~Action
     ⍜GameState!⊃Action Board(Action Process)
-    RedrawScene
+    RedrawScene RebuildScene
   | °NetMessage~ChatMessage
     ⍜Chat~Message~Sender¬
     ⍜⊙GameState~GameMode≈Online~Chat≈History⊂
@@ -309,16 +314,20 @@ LoadPTN ← (memo⍣(
   )
 )
 
+# TODO: Turn this into GameState~Call if it becomes possible
+NewGameState ← (
+  ⊙I~Texture~LoadImage ∩⌟↯ ⟜⊂WinSize 4 0
+  ⟜∘ °△0_0_0
+  GameState
+  RedrawScene RebuildScene
+)
+
 Action
 
 I~Open WinSize "Tak"
 I~Window!°FPS 30
 
-⊙I~Texture~LoadImage ∩⌟↯ ⟜⊂WinSize 4 0
-
-GameState
-
-RedrawScene
+NewGameState
 
 I~Loop!(
   I~Draw~Background ↯4 0
