@@ -60,21 +60,6 @@ Message₂ ← I~Draw~Text White 30 100_140
   }
 └─╴
 
-DefaultCamPos ← [5π/4 ∠√2 1]
-
-~GameState {
-  IdxVoxels
-  BoardVoxels
-  ClickMap
-  Texture
-  Action
-  Board
-  GameMode
-  CamPos ← DefaultCamPos
-  # Turn to view; ∞ means present
-  PastView ← ∞
-}
-
 ┌─╴NetMessage
   |JoinRequest {MyPort}
   |JoinAccept {BoardSize YourColor PTN}
@@ -83,216 +68,240 @@ DefaultCamPos ← [5π/4 ∠√2 1]
   |ChatMessage {Message}
 └─╴
 
-# Rebuild voxel arrays from the board state
-# GameState ? GameState
-RebuildScene ← (
-  # If PastView is ∞, create a scene out of the present
-  # Otherwise, make one out of the corresponding past state
-  ⊸GameState~PastView
-  ⍣(GameState!⊸⊃Action Board °∞
-  | Action°⊸Board~State⊏⊙(⊸Board~History⊸GameState~Board))
+DefaultCamPos ← [5π/4 ∠√2 1]
 
-  Scene≈IdxsAndBuild
-  GameState!°⊸⊃IdxVoxels BoardVoxels
-)
-
-# Redraw textures from the voxel arrays
-# GameState ? GameState
-RedrawScene ← (
-  ∩⌟MkVoxels GameState!⊸⊃(IdxVoxels|BoardVoxels|CamPos)
-  GameState!°⊸⊃(ClickMap|I~Texture~Image Texture)
-)
-
-# Rotate the camera based on player input
-# GameState ? GameState
-HandleCamRotation ← (
-  ⊸≠₀/+I~Key~ULDR 0
-  ⨬◌(×I~Window~Dt⊟¯°ℂ
-     ⍜⊙GameState~CamPos(⍜°⊟⊓(◿τ|↥0.08↧-0.08 π)-)
-     RedrawScene)
-
-  I~Key~Pressed‼@r(
-    °⊸GameState~CamPos DefaultCamPos
-    RedrawScene
-  )
-)
-
-# Switch the currently viewed past move based on player input
-# GameState ? GameState
-HandlePastViewing ← (
-  ⊸⌵-∩I~Key~Pressed @- @=
-  ⨬◌(
-    ⊙(⊸⊃GameState~PastView GameState~Board≈Turn
-      ⍥⋅⟜∘⊸=∞)
-    I~Key!(∨∩Down LeftShift RightShift)
-    ⨬+(∪⨬0 ∞↥₀)
-    ⍥⋅∞⤚≤↥₀
-    °⊸GameState~PastView
-    RedrawScene RebuildScene
-  )
-)
-
-# Modify the currently active move based on player input
-# GameState ? GameState
-HandleBoardClick ← I~Mouse!Pressed‼Left(
-  ⊙⊸GameState~ClickMap
-  ⊸±⊡⌊×◡⋅△÷WinSize˜⊟°ℂ
-  ⨬◌(
-    ⊙⊸⊃(♭₂⇡△◡⋅Board~State GameState!⊃Action Board)
-    ⊏-₁
-    Action~ClickSquare
-  
-    GameState!°⊸⊃Action Board
-    °⊸GameState~PastView ∞
-    RedrawScene RebuildScene
-  )
-)
-
-# Submit the currently active move based on player input,
-# sending a corresponding net message if in online mode
-# GameState ? GameState
-HandleActionSubmission ← ⍣(
-  GameState!⊸⊃Action Board
-  Process~Validate
-  I~Draw~Text White 40 -50_60 WinSize ">"
-  I~Key!Pressed‼Space(
-    ⍣(◡⊙⋅GameState~GameMode≈Online~Tunnel
-      NetMessage~DoAction
-      I~Net~Give
-    | )
-    Process
+┌─╴Game
+  ~ {
+    ClickMap
+    Texture
     Action
+    Board
+    GameMode
+    CamPos ← DefaultCamPos
+    # Turn to view; ∞ means present
+    PastView ← ∞
+    IdxVoxels ← °△0_0_0
+    BoardVoxels ← °△0_0_0
+  }
+
+  # Rebuild voxel arrays from the board state
+  # Game ? Game
+  RebuildScene ← (
+    # If PastView is ∞, create a scene out of the present
+    # Otherwise, make one out of the corresponding past state
+    ⊸PastView
+    ⍣(⊸⊃Action Board °∞
+    | Action°⊸Board~State⊏⊙(⊸Board~History⊸Board))
+  
+    Scene≈IdxsAndBuild
+    °⊸⊃IdxVoxels BoardVoxels
   )
-  GameState!°⊸⊃Action Board
-| )
 
-# Error if not in a game end state, and displays a game end message if not viewing a past move
-# ? GameState
-HandleWinState ← (
-  ⊸GameState~Board
-  Board!⍣(
-    ⟜(°1⊸/↥CheckRoadWin)
-    # Bias for the player that was just active in case of a double road
-    ⍜⊏(+0.1) ¬ActivePlayer
-  | °1⊸/↥CheckFlatWin)
-  # Don't draw the game end message if viewing a past move
-  ⍣(°1≠∞⋅GameState~PastView
-  | Message₁ "Draw" °1_1
-  | ⊢⍖
-    ⍣(=⊙GameState~GameMode≈Online~MyColor
-      {"You lose!" "You win!"}
-    | {"White wins!" "Black wins!"})
-    Message₁ ˜⊏
+  # Redraw textures from the voxel arrays
+  # Game ? Game
+  RedrawScene ← (
+    ∩⌟MkVoxels ⊸⊃(IdxVoxels|BoardVoxels|CamPos)
+    °⊸⊃(ClickMap|I~Texture~Image Texture)
   )
-)
 
-# Error if in online mode and it is not this player's turn
-# ? GameState
-CheckActivePlayer ← (
-  ⟜GameState~GameMode
-  ⍣⋅°GameMode~Local(
-    ◌°⟜∘⊓GameState~Board≈ActivePlayer GameMode~Online~MyColor
-  )
-)
-
-# Handle board clicks and move submission by the active player
-# GameState ? GameState
-HandleActivePlayer ← (
-  ⊸CheckActivePlayer
-  HandleBoardClick
-  HandleActionSubmission
-)
-
-# Receive and process net messages in online mode
-# GameState ? GameState
-HandleMultiplayerWait ← (
-  ⊸GameState~GameMode≈Online~Tunnel
-  I~Net~Get!⍣(
-    °NetMessage~DoAction
-    °⊸GameState~Action
-    ⍜GameState!⊃Action Board(Action Process)
-    RedrawScene RebuildScene
-  | °NetMessage~ChatMessage
-    ⍜Chat~Message~Sender¬
-    ⍜⊙GameState~GameMode≈Online~Chat≈History⊂
-  | °NetMessage~JoinRequest
-    I~Net~Connect⊙(I~Net~Start!°⊸LocalPort +⚂₁₀₀ 8080)
-    ⊸I~Net~Give NetMessage~JoinReject
-    I~Net~End
-  )
-)
-
-# Handle client-side interaction with the in-game chat
-# GameState ? GameState
-HandleChatInteraction ← (
-  I~Mouse!Pressed‼Left⋅⍣(°⊸GameState~GameMode≈Online~Chat≈Focused0|)
-
-  ⍣(⊸GameState~GameMode≈Online~Chat
-    °1 ⊸Chat~Focused
-    I~Key~Pressed @\n
-    ⨬(⍜Chat~Draft (▽⊸≠ @\t I~Key~Input)
-    | ⊸Chat~Draft
-      ±⊸⧻
-      ⨬◌(
-        Chat~Message 0 now
-        ⟜⍜⊙Chat~History⊂
-        NetMessage~ChatMessage
-        ⊙◡⋅GameState~GameMode≈Online~Tunnel
-        I~Net~Give
-        °⊸Chat~Draft ""
-      )
-      °⊸Chat~Focused 0
+  # Rotate the camera based on player input
+  # Game ? Game
+  HandleCamRotation ← (
+    ⊸≠₀/+I~Key~ULDR 0
+    ⨬◌(×I~Window~Dt⊟¯°ℂ
+       ⍜⊙CamPos(⍜°⊟⊓(◿τ|↥0.08↧-0.08 π)-)
+       RedrawScene)
+  
+    I~Key~Pressed‼@r(
+      °⊸CamPos DefaultCamPos
+      RedrawScene
     )
-    °⊸GameState~GameMode≈Online~Chat
-  | I~Key~Pressed‼@\n(°⊸GameState~GameMode≈Online~Chat≈Focused 1)
-  | )
-
-  ⍣(I~Key~Pressed‼@\t⍜GameState~GameMode≈Online~Chat≈Focused¬
-    ⊸GameState~GameMode≈Online~Chat≈Draw
-  | )
-)
-
-# Draw numbers in the corners of the screen indicating how many
-# pieces of each type remain for each player
-# ? GameState
-DrawPieceCounters ← (
-  GameState!⊃Board PastView
-  Board!⊃(⍣(˜⊏History|State)|NFlats|NCaps)
-  ⟜¯
-  ∩⌟₂(
-    /◇⊂♭ ↥₀
-    ⊃(∊Flat_Wall|=Cap)
-    ˜∩-∩/+
   )
-  °⋕⊟₄
-  [20_20 20_60 [-55⊢WinSize 20] [-55⊢WinSize 60]]
-  ▽2Player₁_Player₂ 40
-  I~Draw~Text
-)
 
-# If viewing a past state, display how many moves ago it was
-# ? GameState
-DrawPastMessage ← (
-  ⊸±-⊸↧⊃GameState~PastView GameState~Board≈Turn
-  ⨬◌(⟜(⨬""@s>1)
-     Message₂ $"_ move_ ago")
-)
+  # Switch the currently viewed past move based on player input
+  # Game ? Game
+  HandlePastViewing ← (
+    ⊸⌵-∩I~Key~Pressed @- @=
+    ⨬◌(
+      ⊙(⊸⊃PastView Board≈Turn
+        ⍥⋅⟜∘⊸=∞)
+      I~Key!(∨∩Down LeftShift RightShift)
+      ⨬+(∪⨬0 ∞↥₀)
+      ⍥⋅∞⤚≤↥₀
+      °⊸PastView
+      RedrawScene RebuildScene
+    )
+  )
 
-# Display a clarification message that during the first two moves
-# of the game, opponents place each other's pieces
-# ? GameState
-DrawBeginningMessage ← (
-  <2 GameState~Board≈Turn
-  ⍥(Message₁ "Place your opponent's piece")
-)
+  # Modify the currently active move based on player input
+  # Game ? Game
+  HandleBoardClick ← I~Mouse!Pressed‼Left(
+    ⊙⊸ClickMap
+    ⊸±⊡⌊×◡⋅△÷WinSize˜⊟°ℂ
+    ⨬◌(
+      ⊙⊸⊃(♭₂⇡△◡⋅Board~State ⊃Action Board)
+      ⊏-₁
+      Action~ClickSquare
+    
+      °⊸⊃Action Board
+      °⊸PastView ∞
+      RedrawScene RebuildScene
+    )
+  )
 
-# Serialize the game history as a Portable Tak Notation string
-# PTN ? GameState
-ExportPTN ← (
-  GameState~Board≈PTNRecord
-  +₁°⊏≡°⊟⬚""↯∞_2
-  ⬚""/◇⊂₃@\n⍚$"_. _ _"
-)
+  # Submit the currently active move based on player input,
+  # sending a corresponding net message if in online mode
+  # Game ? Game
+  HandleActionSubmission ← ⍣(
+    ⊸⊃Action Board
+    Process~Validate
+    I~Draw~Text White 40 -50_60 WinSize ">"
+    I~Key!Pressed‼Space(
+      ⍣(◡⊙⋅GameMode≈Online~Tunnel
+        NetMessage~DoAction
+        I~Net~Give
+      | )
+      Process
+      Action~New
+    )
+    °⊸⊃Action Board
+  | )
+
+  # Error if not in a game end state, and displays a game end message if not viewing a past move
+  # ? Game
+  HandleWinState ← (
+    ⊸Board
+    Board!⍣(
+      ⟜(°1⊸/↥CheckRoadWin)
+      # Bias for the player that was just active in case of a double road
+      ⍜⊏(+0.1) ¬ActivePlayer
+    | °1⊸/↥CheckFlatWin)
+    # Don't draw the game end message if viewing a past move
+    ⍣(°1≠∞⋅Game~PastView
+    | Message₁ "Draw" °1_1
+    | ⊢⍖
+      ⍣(=⊙GameMode≈Online~MyColor
+        {"You lose!" "You win!"}
+      | {"White wins!" "Black wins!"})
+      Message₁ ˜⊏
+    )
+  )
+
+  # Error if in online mode and it is not this player's turn
+  # ? Game
+  CheckActivePlayer ← (
+    ⟜GameMode
+    ⍣⋅°GameMode~Local(
+      ◌°⟜∘⊓Board≈ActivePlayer GameMode~Online~MyColor
+    )
+  )
+
+  # Handle board clicks and move submission by the active player
+  # Game ? Game
+  HandleActivePlayer ← (
+    ⊸CheckActivePlayer
+    HandleBoardClick
+    HandleActionSubmission
+  )
+
+  # Receive and process net messages in online mode
+  # Game ? Game
+  HandleMultiplayerWait ← (
+    ⊸GameMode≈Online~Tunnel
+    I~Net~Get!⍣(
+      °NetMessage~DoAction
+      °⊸Action
+      ⍜⊃Action Board(Action~New Process)
+      RedrawScene RebuildScene
+    | °NetMessage~ChatMessage
+      ⍜Chat~Message~Sender¬
+      ⍜⊙GameMode≈Online~Chat≈History⊂
+    | °NetMessage~JoinRequest
+      I~Net~Connect⊙(I~Net~Start!°⊸LocalPort +⚂₁₀₀ 8080)
+      ⊸I~Net~Give NetMessage~JoinReject
+      I~Net~End
+    )
+  )
+
+  # Handle client-side interaction with the in-game chat
+  # Game ? Game
+  HandleChatInteraction ← (
+    I~Mouse!Pressed‼Left⋅⍣(°⊸GameMode≈Online~Chat≈Focused0|)
+  
+    ⍣(⊸GameMode≈Online~Chat
+      °1 ⊸Chat~Focused
+      I~Key~Pressed @\n
+      ⨬(⍜Chat~Draft (▽⊸≠ @\t I~Key~Input)
+      | ⊸Chat~Draft
+        ±⊸⧻
+        ⨬◌(
+          Chat~Message 0 now
+          ⟜⍜⊙Chat~History⊂
+          NetMessage~ChatMessage
+          ⊙◡⋅GameMode≈Online~Tunnel
+          I~Net~Give
+          °⊸Chat~Draft ""
+        )
+        °⊸Chat~Focused 0
+      )
+      °⊸GameMode≈Online~Chat
+    | I~Key~Pressed‼@\n(°⊸GameMode≈Online~Chat≈Focused 1)
+    | )
+  
+    ⍣(I~Key~Pressed‼@\t⍜GameMode≈Online~Chat≈Focused¬
+      ⊸GameMode≈Online~Chat≈Draw
+    | )
+  )
+
+  # Draw numbers in the corners of the screen indicating how many
+  # pieces of each type remain for each player
+  # ? Game
+  DrawPieceCounters ← (
+    ⊃Board PastView
+    Board!⊃(⍣(˜⊏History|State)|NFlats|NCaps)
+    ⟜¯
+    ∩⌟₂(
+      /◇⊂♭ ↥₀
+      ⊃(∊Flat_Wall|=Cap)
+      ˜∩-∩/+
+    )
+    °⋕⊟₄
+    [20_20 20_60 [-55⊢WinSize 20] [-55⊢WinSize 60]]
+    ▽2Player₁_Player₂ 40
+    I~Draw~Text
+  )
+
+  # If viewing a past state, display how many moves ago it was
+  # ? Game
+  DrawPastMessage ← (
+    ⊸±-⊸↧⊃PastView Board≈Turn
+    ⨬◌(⟜(⨬""@s>1)
+       Message₂ $"_ move_ ago")
+  )
+
+  # Display a clarification message that during the first two moves
+  # of the game, opponents place each other's pieces
+  # ? Game
+  DrawBeginningMessage ← (
+    <2 Board≈Turn
+    ⍥(Message₁ "Place your opponent's piece")
+  )
+
+  # Serialize the game history as a Portable Tak Notation string
+  # PTN ? Game
+  ExportPTN ← (
+    Board≈PTNRecord
+    +₁°⊏≡°⊟⬚""↯∞_2
+    ⬚""/◇⊂₃@\n⍚$"_. _ _"
+  )
+
+  # Game ? Board GameMode
+  Call ← (
+    Action~New
+    ⊙I~Texture~LoadImage ∩⌟↯ ⟜⊂WinSize 4 0
+    RedrawScene RebuildScene New
+  )
+└─╴
 
 QueryBoardSize ← (
   &pf "Enter board size (5): "
@@ -336,7 +345,7 @@ LoadPTN ← (memo⍣(
     NetMessage~JoinRequest
     ⊸I~Net~Give
     &p "Connecting..."
-    ⟜(I~Net~TryGet!°⊸Block1)
+    ⟜I~Net~TryGet!(°⊸Block1)
     ⍣(⊙⊸°NetMessage~JoinReject
       &p "That game has already been joined!"
       ⊸I~Net~End
@@ -352,24 +361,14 @@ LoadPTN ← (memo⍣(
   )
 )
 
-# TODO: Turn this into GameState~Call if it becomes possible
-# GameState ? Board GameMode
-NewGameState ← (
-  Action
-  ⊙I~Texture~LoadImage ∩⌟↯ ⟜⊂WinSize 4 0
-  ⟜∘ °△0_0_0
-  GameState
-  RedrawScene RebuildScene
-)
-
 I~Open WinSize "Tak"
 I~Window!°FPS 30
 
-NewGameState
+Game
 
-I~Loop!(
+I~Loop!Game!(
   I~Draw~Background ↯4 0
-  I~Draw~Background ⊸GameState~Texture
+  I~Draw~Background ⊸Texture
 
   HandleCamRotation
 
@@ -383,7 +382,7 @@ I~Loop!(
   | ⍣(⊸CheckActivePlayer
       ⊸DrawBeginningMessage
     | Message₁ "Waiting for opponent...")
-    °0 ⍣⊸GameState~GameMode≈Online~Chat≈Focused0
+    ⍣(°0⊸GameMode≈Online~Chat≈Focused|)
     HandleActivePlayer
   | )
 
@@ -394,8 +393,8 @@ I~Loop!(
   ⊸DrawPastMessage
 )
 
-&p⊸ExportPTN
+&p⊸Game~ExportPTN
 
 ⟜↓(
-  I~Texture~Unload GameState~Texture
-| ⍣(I~Net~End GameState~GameMode≈Online~Tunnel|))
+  I~Texture~Unload Game~Texture
+| ⍣(I~Net~End Game~GameMode≈Online~Tunnel|))
