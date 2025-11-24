@@ -12,6 +12,9 @@ T‼ ← &p $"_ took _" ^0 ⍜now^1
 VoxelScale ← 2.5
 WinSize    ← 700_700
 
+DefaultCamPos ← [5π/4 ∠√2 1]
+DragSpeed     ← [0.005 0.005]
+
 # Create an online join code from a number
 Code ← ⌅(+@A⊥26|⌝⊥26-@A⌵)
 # Normalized spherical to rectangular coordinates
@@ -29,7 +32,7 @@ Message₂ ← I~Draw~Text White 30 100_140
 ┌─╴Chat
   ┌─╴Message
     ~ {Sender Time Content}
-    Fmt ← ⊂ ⨬⋅""⨬"You: " "Them: " ±⊃(Time|Sender|Content)
+    Fmt ← ⊂ ⨬⋅""⨬"You: " "Them " ±⊃(Time|Sender|Content)
   └─╴
 
   ~ {
@@ -68,8 +71,6 @@ Message₂ ← I~Draw~Text White 30 100_140
   |ChatMessage {Message}
 └─╴
 
-DefaultCamPos ← [5π/4 ∠√2 1]
-
 ┌─╴Game
   ~ {
     ClickMap
@@ -77,6 +78,7 @@ DefaultCamPos ← [5π/4 ∠√2 1]
     Action
     Board
     GameMode
+    # [Yaw Pitch]
     CamPos ← DefaultCamPos
     # Turn to view; ∞ means present
     PastView ← ∞
@@ -104,9 +106,9 @@ DefaultCamPos ← [5π/4 ∠√2 1]
     °⊸⊃(ClickMap|I~Texture~Image Texture)
   )
 
-  # Rotate the camera based on player input
+  # Rotate the camera based on keyboard input
   # Game ? Game
-  HandleCamRotation ← (
+  HandleKeyCamRotation ← (
     ⊸≠₀/+I~Key~ULDR 0
     ⨬◌(×I~Window~Dt⊟¯°ℂ
        ⍜⊙CamPos(⍜°⊟⊓(◿τ|↥0.08↧-0.08 π)-)
@@ -118,7 +120,16 @@ DefaultCamPos ← [5π/4 ∠√2 1]
     )
   )
 
-  # Switch the currently viewed past move based on player input
+  # Rotate the camera based on mouse input
+  # Game ? Game
+  HandleMouseCamRotation ← I~Mouse!Drag‼Right(
+    ×DragSpeed⊟°ℂ
+    ⍜⊣¯
+    ⍜⊙CamPos+
+    RedrawScene
+  )
+
+  # Switch the currently viewed past move based on keyboard input
   # Game ? Game
   HandlePastViewing ← (
     ⊸⌵-∩I~Key~Pressed @- @=
@@ -133,7 +144,7 @@ DefaultCamPos ← [5π/4 ∠√2 1]
     )
   )
 
-  # Modify the currently active move based on player input
+  # Modify the currently active move based on mouse input
   # Game ? Game
   HandleBoardClick ← I~Mouse!Pressed‼Left(
     ⊙⊸ClickMap
@@ -370,7 +381,8 @@ I~Loop!Game!(
   I~Draw~Background ↯4 0
   I~Draw~Background ⊸Texture
 
-  HandleCamRotation
+  HandleKeyCamRotation
+  HandleMouseCamRotation
 
   HandlePastViewing
 
