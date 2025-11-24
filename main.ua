@@ -87,6 +87,8 @@ Message₂ ← I~Draw~Text White 30 100_140
     PastView ← ∞
     IdxVoxels ← °△0_0_0
     BoardVoxels ← °△0_0_0
+    # Whether or not the last click involved a drag
+    Dragged ← 0
   }
 
   # Rebuild voxel arrays from the board state
@@ -125,31 +127,32 @@ Message₂ ← I~Draw~Text White 30 100_140
 
   # Rotate the camera based on mouse input
   # Game ? Game
-  HandleMouseCamRotation ← I~Mouse!Drag‼Right(
+  HandleMouseCamRotation ← ⍣I~Mouse!Drag‼Left(
+    ⍥⊸(°1>10⌵)¬◡⋅Dragged
     ×DragSpeed⊟°ℂ
     ⍜⊣¯
     ⍜⊙CamPos(LimitCam+)
     RedrawScene
-  )
+    °⊸Dragged1
+  )()
 
   # Switch the currently viewed past move based on keyboard input
   # Game ? Game
-  HandlePastViewing ← (
-    ⊸⌵-∩I~Key~Pressed @- @=
-    ⨬◌(
-      ⊙(⊸⊃PastView Board≈Turn
-        ⍥⋅⟜∘⊸=∞)
-      I~Key!(∨∩Down LeftShift RightShift)
-      ⨬+(∪⨬0 ∞↥₀)
-      ⍥⋅∞⤚≤↥₀
-      °⊸PastView
-      RedrawScene RebuildScene
-    )
-  )
+  HandlePastViewing ← ⍣(
+    °1⊸⌵-∩I~Key~Pressed @- @=
+    ⊙(⊸⊃PastView Board≈Turn
+      ⍥⋅⟜∘⊸=∞)
+    I~Key!(∨∩Down LeftShift RightShift)
+    ⨬+(∪⨬0 ∞↥₀)
+    ⍥⋅∞⤚≤↥₀
+    °⊸PastView
+    RedrawScene RebuildScene
+  | )
 
   # Modify the currently active move based on mouse input
   # Game ? Game
-  HandleBoardClick ← I~Mouse!Pressed‼Left(
+  HandleBoardClick ← ⍣I~Mouse!Released‼Left(
+    °0◡⋅Dragged
     ⊙⊸ClickMap
     ⊸±⊡⌊×◡⋅△÷WinSize˜⊟°ℂ
     ⨬◌(
@@ -161,7 +164,7 @@ Message₂ ← I~Draw~Text White 30 100_140
       °⊸PastView ∞
       RedrawScene RebuildScene
     )
-  )
+  )(°⊸Dragged0)
 
   # Submit the currently active move based on player input,
   # sending a corresponding net message if in online mode
