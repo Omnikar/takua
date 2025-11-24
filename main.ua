@@ -20,6 +20,9 @@ Code ← ⌅(+@A⊥26|⌝⊥26-@A⌵)
 # Normalized spherical to rectangular coordinates
 SphToRect ← ˜⊂×⍜°⊟∩°∠
 
+# Apply bounds to camera rotation
+LimitCam ← ⍜°⊟⊓(◿τ|↥0.08↧-0.08 π)
+
 # Render voxels and rescale to screen size
 # ? Voxels CamPos
 MkVoxels ← ▽₂⊢÷△₂⊸⊙WinSize voxels!°⊸⊃Scale Camera VoxelScale SphToRect ˜∘
@@ -93,7 +96,7 @@ Message₂ ← I~Draw~Text White 30 100_140
     # Otherwise, make one out of the corresponding past state
     ⊸PastView
     ⍣(⊸⊃Action Board °∞
-    | Action°⊸Board~State⊏⊙(⊸Board~History⊸Board))
+    | Action~New°⊸Board~State⊏⊙(⊸Board~History⊸Board))
   
     Scene≈IdxsAndBuild
     °⊸⊃IdxVoxels BoardVoxels
@@ -111,7 +114,7 @@ Message₂ ← I~Draw~Text White 30 100_140
   HandleKeyCamRotation ← (
     ⊸≠₀/+I~Key~ULDR 0
     ⨬◌(×I~Window~Dt⊟¯°ℂ
-       ⍜⊙CamPos(⍜°⊟⊓(◿τ|↥0.08↧-0.08 π)-)
+       ⍜⊙CamPos(LimitCam-)
        RedrawScene)
   
     I~Key~Pressed‼@r(
@@ -125,7 +128,7 @@ Message₂ ← I~Draw~Text White 30 100_140
   HandleMouseCamRotation ← I~Mouse!Drag‼Right(
     ×DragSpeed⊟°ℂ
     ⍜⊣¯
-    ⍜⊙CamPos+
+    ⍜⊙CamPos(LimitCam+)
     RedrawScene
   )
 
