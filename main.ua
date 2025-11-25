@@ -21,7 +21,7 @@ Code ← ⌅(+@A⊥26|⌝⊥26-@A⌵)
 SphToRect ← ˜⊂×⍜°⊟∩°∠
 
 # Apply bounds to camera rotation
-LimitCam ← ⍜°⊟⊓(◿τ|↥0.08↧-0.08 π)
+LimitCam ← ⍜°⊟⊓(◿τ|↥0.2↧-0.2 π)
 
 # Render voxels and rescale to screen size
 # ? Voxels CamPos
