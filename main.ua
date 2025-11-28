@@ -240,6 +240,11 @@ Message₂ ← I~Draw~Text White 30 100_140
     )
   )
 
+  # Error if in online mode and the chat is focused
+  # Used to prevent keybinds from triggering upon chat typing
+  # ? Game
+  CheckChatUnfocused ← °0⍣GameMode≈Online~Chat≈Focused 0
+
   # Handle client-side interaction with the in-game chat
   # Game ? Game
   HandleChatInteraction ← (
@@ -392,15 +397,18 @@ I~Loop!Game!(
 
   HandlePastViewing
 
-  I~Key~Pressed‼@e(&p⊸ExportPTN)
-
   HandleChatInteraction
+
+  I~Key~Pressed‼@e⍣(
+    ⊸CheckChatUnfocused
+    &p⊸ExportPTN
+  | )
 
   ⍣(⊸HandleWinState
   | ⍣(⊸CheckActivePlayer
       ⊸DrawBeginningMessage
     | Message₁ "Waiting for opponent...")
-    ⍣(°0⊸GameMode≈Online~Chat≈Focused|)
+    ⊸CheckChatUnfocused
     HandleActivePlayer
   | )
 
