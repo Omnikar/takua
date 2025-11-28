@@ -24,8 +24,8 @@ SphToRect ← ˜⊂×⍜°⊟∩°∠
 LimitCam ← ⍜°⊟⊓(◿τ|↥0.2↧-0.2 π)
 
 # Render voxels and rescale to screen size
-# ? Voxels CamPos
-MkVoxels ← ▽₂⊢÷△₂⊸⊙WinSize voxels!°⊸⊃Scale Camera VoxelScale SphToRect ˜∘
+# ? CamPos Voxels
+MkVoxels ← ▽₂⊢÷△₂⊸⊙WinSize voxels!°⊸⊃Scale Camera VoxelScale SphToRect
 
 # Draw an on-screen message
 Message₁ ← I~Draw~Text White 30 100_100
@@ -35,7 +35,7 @@ Message₂ ← I~Draw~Text White 30 100_140
 ┌─╴Chat
   ┌─╴Message
     ~ {Sender Time Content}
-    Fmt ← ⊂ ⨬⋅""⨬"You: " "Them " ±⊃(Time|Sender|Content)
+    Fmt ← ⊂ ⨬⋅""⨬"You: " "Them: " ±⊃(Time|Sender|Content)
   └─╴
 
   ~ {
@@ -107,7 +107,7 @@ Message₂ ← I~Draw~Text White 30 100_140
   # Redraw textures from the voxel arrays
   # Game ? Game
   RedrawScene ← (
-    ∩⌟MkVoxels ⊸⊃(IdxVoxels|BoardVoxels|CamPos)
+    ∩⌞MkVoxels ⊸⊃(CamPos|IdxVoxels|BoardVoxels)
     °⊸⊃(ClickMap|I~Texture~Image Texture)
   )
 
@@ -184,7 +184,7 @@ Message₂ ← I~Draw~Text White 30 100_140
     °⊸⊃Action Board
   | )
 
-  # Error if not in a game end state, and displays a game end message if not viewing a past move
+  # Error if not in a game end state, and display a game end message if not viewing a past move
   # ? Game
   HandleWinState ← (
     ⊸Board
