@@ -195,7 +195,7 @@ Message₂ ← I~Draw~Text White 30 100_140
     | °1⊸/↥CheckFlatWin)
     # Don't draw the game end message if viewing a past move
     ⍣(°1≠∞⋅Game~PastView
-    | Message₁ "Draw" °1_1
+    | Message₁ ⋅"Draw" °1_1
     | ⊢⍖
       ⍣(=⊙GameMode≈Online~MyColor
         {"You lose!" "You win!"}
