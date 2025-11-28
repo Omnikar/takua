@@ -186,7 +186,7 @@ Message₂ ← I~Draw~Text White 30 100_140
 
   # Error if not in a game end state, and display a game end message if not viewing a past move
   # ? Game
-  HandleWinState ← (
+  DrawWinMessage ← (
     ⊸Board
     Board!⍣(
       ⟜(°1⊸/↥CheckRoadWin)
@@ -404,7 +404,7 @@ I~Loop!Game!(
     &p⊸ExportPTN
   | )
 
-  ⍣(⊸HandleWinState
+  ⍣(⊸DrawWinMessage
   | ⍣(⊸CheckActivePlayer
       ⊸DrawBeginningMessage
     | Message₁ "Waiting for opponent...")
