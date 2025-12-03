@@ -32,6 +32,7 @@ Message₁ ← I~Draw~Text White 30 100_100
 # Draw an on-screen message at a different position than Message₁
 Message₂ ← I~Draw~Text White 30 100_140
 
+# The in-game chat for online mode
 ┌─╴Chat
   ┌─╴Message
     ~ {Sender Time Content}
@@ -57,6 +58,7 @@ Message₂ ← I~Draw~Text White 30 100_140
   )
 └─╴
 
+# Whether the game is played locally or online, and relevant information
 ┌─╴GameMode
   |Local
   |Online {
@@ -66,6 +68,7 @@ Message₂ ← I~Draw~Text White 30 100_140
   }
 └─╴
 
+# Information to be sent between player clients in online mode
 ┌─╴NetMessage
   |JoinRequest {MyPort}
   |JoinAccept {BoardSize YourColor ActionHistory}
@@ -74,18 +77,26 @@ Message₂ ← I~Draw~Text White 30 100_140
   |ChatMessage {Message}
 └─╴
 
+# The top-level state of the game client
 ┌─╴Game
   ~ {
+    # Image produced by `voxels` for checking which square is clicked on
     ClickMap
+    # Texture for rendering to the screen, updated using an image produced by `voxels` whenever a redraw is necessary
     Texture
+    # The `Action` instance currently being created by the player clicking on the board
     Action
+    # The current state of the game board
     Board
+    # Either local or online
     GameMode
-    # [Yaw Pitch]
+    # Camera position as [Yaw Pitch]
     CamPos ← DefaultCamPos
     # Turn to view; ∞ means present
     PastView ← ∞
+    # Voxel model used to create a board square click map
     IdxVoxels ← °△0_0_0
+    # Voxel model of the board and pieces
     BoardVoxels ← °△0_0_0
     # Whether or not the last click involved a drag
     Dragged ← 0
