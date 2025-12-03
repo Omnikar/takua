@@ -403,7 +403,7 @@ I~Window!°FPS 30
 Game
 
 I~Loop!Game!(
-  I~Draw~Background ↯4 0
+  I~Draw~Background Black
   I~Draw~Background ⊸Texture
 
   HandleKeyCamRotation
