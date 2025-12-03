@@ -68,7 +68,7 @@ Message₂ ← I~Draw~Text White 30 100_140
 
 ┌─╴NetMessage
   |JoinRequest {MyPort}
-  |JoinAccept {BoardSize YourColor PTN}
+  |JoinAccept {BoardSize YourColor ActionHistory}
   |JoinReject
   |DoAction {Action}
   |ChatMessage {Message}
@@ -325,16 +325,19 @@ Message₂ ← I~Draw~Text White 30 100_140
   )
 └─╴
 
+# BoardSize ?
 QueryBoardSize ← (
   &pf "Enter board size (5): "
   ⍣(∩°1⊸⊃≥₃≤₈⋕)5 &sc
 )
 
+# MyColor ?
 QueryMyColor ← (
   &pf "Player [1] or player [2] (random)? "
   ⍣(-₁°1⊸∊1_2⋕|⁅⚂) &sc
 )
 
+# ActionHistory ?
 LoadPTN ← (memo⍣(
     °□⊏1&args
     ⍣(&rs ∞ 0 &p"Enter PTN:" °"--stdin")&fras
@@ -375,7 +378,7 @@ LoadPTN ← (memo⍣(
     | )
     ⊙NetMessage~JoinAccept!⟜↓(
       Board BoardSize
-    | ∧◇Process PTN
+    | ∧◇Process ActionHistory
     | YourColor
     )
     ˜∘˜GameMode~Online
