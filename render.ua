@@ -65,7 +65,9 @@ BoardModel ← memo(
      ∩(≡⌝↘⁅×VoxelRes BoardPadding)
      ⊓˜⊟⊙(⬚1↙₄BoardBorders)
      ⊙◌∧(⤸0_2⊸⍜⊙⍜°⍉-⬚0×))
-  ⍜∩(↘¯ 1_1⍉)◌≡(⇌|⇌)
+  ≡(⇌|⇌)
+  # ⍜∩(↘¯ 1_1⍉)◌
+  (⍜^◌⊙^)!(↘¯ 1_1⍉)
 
   ApplyLighting
   HollowModel
