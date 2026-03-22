@@ -80,7 +80,7 @@ Cap  ← 3
     # And nowhere else has been clicked already
     °[]◡⋅Amnts
     # Min number of stones and carry limit
-    ∪⌞∘(↧◇∩⧻⊸⊡⊙⊸Board~State)
+    ∪⌞∘(↧◇∩⧻⊸⊡⊙⊸Board.State)
     # Increment the number of stones being
     # carried and limit accordingly
     ⍜Num(↧+₁)
@@ -90,7 +90,7 @@ Cap  ← 3
     ◡⋅Dir
 
     TryMove ← (
-      ⊡⊙◡⋅Board~State
+      ⊡⊙◡⋅Board.State
       # Ensure that the piece being moved
       # onto is not a capstone
       °1⊸<Cap⌵◇⬚1⊢
@@ -98,7 +98,7 @@ Cap  ← 3
       # being moved is a lone capstone
       >Flat
       ⍥(°1-/+⊸⊃Amnts Num
-        °Cap◇⊢⊡◡⊓Orig Board~State)
+        °Cap◇⊢⊡◡⊓Orig Board.State)
 
       ⍜Amnts(⊂1)
     )
@@ -116,7 +116,7 @@ Cap  ← 3
     ⍣( # If a move hasn't been started yet
       °Uninit ˜∘
       # Check if the square is occupied
-      ⊡◡⊙Board~State
+      ⊡◡⊙Board.State
       # If empty, start a place
       # Otherwise, check that the active player
       # controls this square and start a move
@@ -129,15 +129,15 @@ Cap  ← 3
     )
 
     # Opponents place each other's flats on the first two turns
-    <2◡⋅Board~Turn
-    ⍥⍣(°⊸Place~Piece¯1|⋅Uninit)
+    <2◡⋅Board.Turn
+    ⍥⍣(°⊸Place.Piece¯1|⋅Uninit)
   )
 
   ClickSquare ← (
     # Change between positive representing player 1 and representing the active player
     FlipPlayer₂ ← (⌅(^0|^0))!(
-      ◡⋅Board~ActivePlayer
-      ⍥⊓⍣⍜Place~Piece¯∘⍜Board~State¯
+      ◡⋅Board.ActivePlayer
+      ⍥⊓⍣⍜Place.Piece¯∘⍜Board.State¯
     )
 
     ⍜⊙FlipPlayer₂ ClickSquareImpl
@@ -173,7 +173,7 @@ Cap  ← 3
     ∩⌟▽⟜¬±◿₃°⊏
     ˜∘⍚°Fmt
     ≠⟜(↙⧻)◿₂⇡◡⋅⧻▽2=□"1."
-    ⍚⍥⍣⍜Place~Piece¯∘
+    ⍚⍥⍣⍜Place.Piece¯∘
   )
 └─╴
 
@@ -181,19 +181,19 @@ Cap  ← 3
 ┌─╴Process
   # Process a placement
   ProcessPlace ← (
-    Action~Place!⊃Pos Piece
-    ˜⌟⍜(°□⊡⊙Board~State)⊂
+    Action.Place!⊃Pos Piece
+    ˜⌟⍜(°□⊡⊙Board.State)⊂
   )
   # Process a movement
-  ProcessMove ← Action~Move!⟜↓(
+  ProcessMove ← Action.Move!⟜↓(
     ⊃Num Orig
-    ⍜⊙⊙(°□⊡|Board~State)⊃↙↘
+    ⍜⊙⊙(°□⊡|Board.State)⊃↙↘
   | ⊃(⇌Amnts|¤Dir|Orig)
     ∧(∪⌟⊃↘↙∘¯⊙+
-      ⊃⋅⋅∘⊙⍜⊙(°□⊡⊙Board~State)⊂)
+      ⊃⋅⋅∘⊙⍜⊙(°□⊡⊙Board.State)⊂)
     ⋅◌
     # Flatten walls
-    ⍜Board~State⍚₀⍜(⌵↘₁|↧Flat)
+    ⍜Board.State⍚₀⍜(⌵↘₁|↧Flat)
   )
   # Assert that a move is completely formed
   Validate ← °1⊸Action!⍣(0°Uninit|=/+Move!⊃Amnts Num|1)
@@ -201,14 +201,14 @@ Cap  ← 3
     Validate
   
     # PTN OldState Board ? Action Board
-    ⊃⊓Action~Fmt Board~State⍣ProcessPlace ProcessMove
+    ⊃⊓Action.Fmt Board.State⍣ProcessPlace ProcessMove
   
     # Check if a wall was flattened, appending an asterisk to the PTN if so
-    ◡⋅⊙Board~State
+    ◡⋅⊙Board.State
     /∨♭×˜∩=Wall Cap∩(⌵≡₀◇⬚0⊢)
     ⤙⊙⊙◌ □⍥(˜⊂@*)
   
-    ⍜Board~PTNRecord⊂
-    ⍜Board~History⊂
+    ⍜Board.PTNRecord⊂
+    ⍜Board.History⊂
   )
 └─╴

@@ -28,9 +28,9 @@ LimitCam ← ⍜°⊟⊓(◿τ|↥0.2↧-0.2 π)
 MkVoxels ← ▽₂⊢÷△₂⊸⊙WinSize voxels!°⊸⊃Scale Camera VoxelScale SphToRect
 
 # Draw an on-screen message
-Message₁ ← I~Draw~Text White 30 100_100
+Message₁ ← I.Draw.Text White 30 100_100
 # Draw an on-screen message at a different position than Message₁
-Message₂ ← I~Draw~Text White 30 100_140
+Message₂ ← I.Draw.Text White 30 100_140
 
 # The in-game chat for online mode
 ┌─╴Chat
@@ -40,7 +40,7 @@ Message₂ ← I~Draw~Text White 30 100_140
   └─╴
 
   ~ {
-    History ← °△⊟0⧻Message~Fields
+    History ← °△⊟0⧻Message.Fields
     Draft ← ""
     Focused ← 0
   }
@@ -51,10 +51,10 @@ Message₂ ← I~Draw~Text White 30 100_140
   | ⊂Message 0 0 ˜⊂@_Draft
     ≡⊟30 ˜-⊣WinSize +40 ×Size°⊏
   | ¬Focused
-    ⨬1(˜-now◡⋅≡Message~Time
+    ⨬1(˜-now◡⋅≡Message.Time
        ¬↥0÷4-8 ∩₃⌞▽⊸<12)
-    ⊙⊙⍚Message~Fmt
-    I~Draw~Text ≡⌞⊂White ⊙Size
+    ⊙⊙⍚Message.Fmt
+    I.Draw.Text ≡⌞⊂White ⊙Size
   )
 └─╴
 
@@ -109,9 +109,9 @@ Message₂ ← I~Draw~Text White 30 100_140
     # Otherwise, make one out of the corresponding past state
     ⊸PastView
     ⍣(⊸⊃Action Board °∞
-    | Action~New°⊸Board~State⊏⊙(⊸Board~History⊸Board))
+    | Action.New°⊸Board.State⊏⊙(⊸Board.History⊸Board))
   
-    Scene≈IdxsAndBuild
+    Scene‥IdxsAndBuild
     °⊸⊃IdxVoxels BoardVoxels
   )
 
@@ -119,18 +119,18 @@ Message₂ ← I~Draw~Text White 30 100_140
   # Game ? Game
   RedrawScene ← (
     ∩⌞MkVoxels ⊸⊃(CamPos|IdxVoxels|BoardVoxels)
-    °⊸⊃(ClickMap|I~Texture~Image Texture)
+    °⊸⊃(ClickMap|I.Texture.Image Texture)
   )
 
   # Rotate the camera based on keyboard input
   # Game ? Game
   HandleKeyCamRotation ← (
-    ⊸≠₀/+I~Key~ULDR 0
-    ⨬◌(×I~Window~Dt⊟¯°ℂ
+    ⊸≠₀/+I.Key.ULDR 0
+    ⨬◌(×I.Window.Dt⊟¯°ℂ
        ⍜⊙CamPos(LimitCam-)
        RedrawScene)
   
-    I~Key~Pressed‼@r(
+    I.Key.Pressed‼@r(
       °⊸CamPos DefaultCamPos
       RedrawScene
     )
@@ -138,7 +138,7 @@ Message₂ ← I~Draw~Text White 30 100_140
 
   # Rotate the camera based on mouse input
   # Game ? Game
-  HandleMouseCamRotation ← ⍣I~Mouse!Drag‼Left(
+  HandleMouseCamRotation ← ⍣I.Mouse!Drag‼Left(
     ⍥⊸(°1>10⌵)¬◡⋅Dragged
     ×DragSpeed⊟°ℂ
     ⍜⊣¯
@@ -150,10 +150,10 @@ Message₂ ← I~Draw~Text White 30 100_140
   # Switch the currently viewed past move based on keyboard input
   # Game ? Game
   HandlePastViewing ← ⍣(
-    °1⊸⌵-∩I~Key~Pressed @- @=
-    ⊙(⊸⊃PastView Board≈Turn
+    °1⊸⌵-∩I.Key.Pressed @- @=
+    ⊙(⊸⊃PastView Board‥Turn
       ⍥⋅⟜∘⊸=∞)
-    I~Key!(∨∩Down LeftShift RightShift)
+    I.Key!(∨∩Down LeftShift RightShift)
     ⨬+(∪⨬0 ∞↥₀)
     ⍥⋅∞⤚≤↥₀
     °⊸PastView
@@ -162,14 +162,14 @@ Message₂ ← I~Draw~Text White 30 100_140
 
   # Modify the currently active move based on mouse input
   # Game ? Game
-  HandleBoardClick ← ⍣I~Mouse!Released‼Left(
+  HandleBoardClick ← ⍣I.Mouse!Released‼Left(
     °0◡⋅Dragged
     ⊙⊸ClickMap
     ⊸±⊡⌊×◡⋅△÷WinSize˜⊟°ℂ
     ⨬◌(
-      ⊙⊸⊃(♭₂⇡△◡⋅Board~State ⊃Action Board)
+      ⊙⊸⊃(♭₂⇡△◡⋅Board.State ⊃Action Board)
       ⊏-₁
-      Action~ClickSquare
+      Action.ClickSquare
     
       °⊸⊃Action Board
       °⊸PastView ∞
@@ -182,15 +182,15 @@ Message₂ ← I~Draw~Text White 30 100_140
   # Game ? Game
   HandleActionSubmission ← ⍣(
     ⊸⊃Action Board
-    Process~Validate
-    I~Draw~Text White 40 -50_60 WinSize ">"
-    I~Key!Pressed‼Space(
-      ⍣(◡⊙⋅GameMode≈Online~Tunnel
-        NetMessage~DoAction
-        I~Net~Give
+    Process.Validate
+    I.Draw.Text White 40 -50_60 WinSize ">"
+    I.Key!Pressed‼Space(
+      ⍣(◡⊙⋅GameMode‥Online.Tunnel
+        NetMessage.DoAction
+        I.Net.Give
       | )
       Process
-      Action~New
+      Action.New
     )
     °⊸⊃Action Board
   | )
@@ -205,10 +205,10 @@ Message₂ ← I~Draw~Text White 30 100_140
       ⍜⊏(+0.1) ¬ActivePlayer
     | °1⊸/↥CheckFlatWin)
     # Don't draw the game end message if viewing a past move
-    ⍣(°1≠∞⋅Game~PastView
+    ⍣(°1≠∞⋅Game.PastView
     | Message₁ ⋅"Draw" °1_1
     | ⊢⍖
-      ⍣(=⊙GameMode≈Online~MyColor
+      ⍣(=⊙GameMode‥Online.MyColor
         {"You lose!" "You win!"}
       | {"White wins!" "Black wins!"})
       Message₁ ˜⊏
@@ -219,8 +219,8 @@ Message₂ ← I~Draw~Text White 30 100_140
   # ? Game
   CheckActivePlayer ← (
     ⟜GameMode
-    ⍣⋅°GameMode~Local(
-      ◌°⟜∘⊓Board≈ActivePlayer GameMode~Online~MyColor
+    ⍣⋅°GameMode.Local(
+      ◌°⟜∘⊓Board‥ActivePlayer GameMode.Online.MyColor
     )
   )
 
@@ -235,54 +235,54 @@ Message₂ ← I~Draw~Text White 30 100_140
   # Receive and process net messages in online mode
   # Game ? Game
   HandleMultiplayerWait ← (
-    ⊸GameMode≈Online~Tunnel
-    I~Net~Get!⍣(
-      °NetMessage~DoAction
+    ⊸GameMode‥Online.Tunnel
+    I.Net.Get!⍣(
+      °NetMessage.DoAction
       °⊸Action
-      ⍜⊃Action Board(Action~New Process)
+      ⍜⊃Action Board(Action.New Process)
       RedrawScene RebuildScene
-    | °NetMessage~ChatMessage
-      ⍜Chat~Message~Sender¬
-      ⍜⊙GameMode≈Online~Chat≈History⊂
-    | °NetMessage~JoinRequest
-      I~Net~Connect⊙(I~Net~Start!°⊸LocalPort +⚂₁₀₀ 8080)
-      ⊸I~Net~Give NetMessage~JoinReject
-      I~Net~End
+    | °NetMessage.ChatMessage
+      ⍜Chat.Message.Sender¬
+      ⍜⊙GameMode‥Online.Chat‥History⊂
+    | °NetMessage.JoinRequest
+      I.Net.Connect⊙(I.Net.Start!°⊸LocalPort +⚂₁₀₀ 8080)
+      ⊸I.Net.Give NetMessage.JoinReject
+      I.Net.End
     )
   )
 
   # Error if in online mode and the chat is focused
   # Used to prevent keybinds from triggering upon chat typing
   # ? Game
-  CheckChatUnfocused ← °0⍣GameMode≈Online~Chat≈Focused 0
+  CheckChatUnfocused ← °0⍣GameMode‥Online.Chat‥Focused 0
 
   # Handle client-side interaction with the in-game chat
   # Game ? Game
   HandleChatInteraction ← (
-    I~Mouse!Pressed‼Left⋅⍣(°⊸GameMode≈Online~Chat≈Focused0|)
+    I.Mouse!Pressed‼Left⋅⍣(°⊸GameMode‥Online.Chat‥Focused0|)
   
-    ⍣(⊸GameMode≈Online~Chat
-      °1 ⊸Chat~Focused
-      I~Key~Pressed @\n
-      ⨬(⍜Chat~Draft (▽⊸≠ @\t I~Key~Input)
-      | ⊸Chat~Draft
+    ⍣(⊸GameMode‥Online.Chat
+      °1 ⊸Chat.Focused
+      I.Key.Pressed @\n
+      ⨬(⍜Chat.Draft (▽⊸≠ @\t I.Key.Input)
+      | ⊸Chat.Draft
         ±⊸⧻
         ⨬◌(
-          Chat~Message 0 now
-          ⟜⍜⊙Chat~History⊂
-          NetMessage~ChatMessage
-          ⊙◡⋅GameMode≈Online~Tunnel
-          I~Net~Give
-          °⊸Chat~Draft ""
+          Chat.Message 0 now
+          ⟜⍜⊙Chat.History⊂
+          NetMessage.ChatMessage
+          ⊙◡⋅GameMode‥Online.Tunnel
+          I.Net.Give
+          °⊸Chat.Draft ""
         )
-        °⊸Chat~Focused 0
+        °⊸Chat.Focused 0
       )
-      °⊸GameMode≈Online~Chat
-    | I~Key~Pressed‼@\n(°⊸GameMode≈Online~Chat≈Focused 1)
+      °⊸GameMode‥Online.Chat
+    | I.Key.Pressed‼@\n(°⊸GameMode‥Online.Chat‥Focused 1)
     | )
   
-    ⍣(I~Key~Pressed‼@\t⍜GameMode≈Online~Chat≈Focused¬
-      ⊸GameMode≈Online~Chat≈Draw
+    ⍣(I.Key.Pressed‼@\t⍜GameMode‥Online.Chat‥Focused¬
+      ⊸GameMode‥Online.Chat‥Draw
     | )
   )
 
@@ -301,13 +301,13 @@ Message₂ ← I~Draw~Text White 30 100_140
     °⋕⊟₄
     [20_20 20_60 [-55⊢WinSize 20] [-55⊢WinSize 60]]
     ▽2Player₁_Player₂ 40
-    I~Draw~Text
+    I.Draw.Text
   )
 
   # If viewing a past state, display how many moves ago it was
   # ? Game
   DrawPastMessage ← (
-    ⊸±-⊸↧⊃PastView Board≈Turn
+    ⊸±-⊸↧⊃PastView Board‥Turn
     ⨬◌(⟜(⨬""@s>1)
        Message₂ $"_ move_ ago")
   )
@@ -316,22 +316,22 @@ Message₂ ← I~Draw~Text White 30 100_140
   # of the game, opponents place each other's pieces
   # ? Game
   DrawBeginningMessage ← (
-    <2 Board≈Turn
+    <2 Board‥Turn
     ⍥(Message₁ "Place your opponent's piece")
   )
 
   # Serialize the game history as a Portable Tak Notation string
   # PTN ? Game
   ExportPTN ← (
-    Board≈PTNRecord
+    Board‥PTNRecord
     +₁°⊏≡°⊟⬚""↯∞_2
     ⬚""/◇⊂₃@\n⍚$"_. _ _"
   )
 
   # Game ? Board GameMode
   Call ← (
-    Action~New
-    ⊙I~Texture~LoadImage ∩⌟↯ ⟜⊂WinSize 4 0
+    Action.New
+    ⊙I.Texture.LoadImage ∩⌟↯ ⟜⊂WinSize 4 0
     RedrawScene RebuildScene New
   )
 └─╴
@@ -350,61 +350,61 @@ QueryMyColor ← (
 
 # ActionHistory ?
 LoadPTN ← (memo⍣(
-    °□⊏1&args
-    ⍣(&rs ∞ 0 &p"Enter PTN:" °"--stdin")&fras
-    Action~ParsePTN
+  °□⊏1&args
+  ⍣(&rs ∞ 0 &p"Enter PTN:" °"--stdin")&fras
+  Action.ParsePTN
   ){})
 
 ⍢◌(&pf "[l]ocal or [o]nline? "
    ¬⊃∊⨂"lo"⬚@.⊢&sc)
-⨬(Board QueryBoardSize GameMode~Local
+⨬(Board QueryBoardSize GameMode.Local
   ∧◇Process LoadPTN
-| I~Net~Start!°⊸LocalPort +⚂₁₀₀ 8080
+| I.Net.Start!°⊸LocalPort +⚂₁₀₀ 8080
   ⍢◌(&pf "[h]ost or [j]oin? "
      ¬⊃∊⨂"hj"⬚@.⊢&sc)
   ⨬(⊙(˜∘ LoadPTN QueryMyColor QueryBoardSize)
-    ⊸I~Net~Port
+    ⊸I.Net.Port
     &p $"Your code is _" Code
     &p "Waiting for opponent to join..."
-    NetMessage~JoinAccept◡⋅(⤙⊙⊙◌¬)
+    NetMessage.JoinAccept◡⋅(⤙⊙⊙◌¬)
     ˜∘⊙↓(
       Board
     | | ∧◇Process
-    | °NetMessage~JoinRequest⊸(I~Net~TryGet!°⊸Block1)
+    | °NetMessage.JoinRequest⊸(I.Net.TryGet!°⊸Block1)
       &p "Connected"
-      I~Net~Connect
-    | ⊸I~Net~Give
-      ˜GameMode~Online)
+      I.Net.Connect
+    | ⊸I.Net.Give
+      ˜GameMode.Online)
   | &pf "Enter host's code: "
     °Code &sc
-    I~Net~Port⤙I~Net~Connect
-    NetMessage~JoinRequest
-    ⊸I~Net~Give
+    I.Net.Port⤙I.Net.Connect
+    NetMessage.JoinRequest
+    ⊸I.Net.Give
     &p "Connecting..."
-    ⟜I~Net~TryGet!(°⊸Block1)
-    ⍣(⊙⊸°NetMessage~JoinReject
+    ⟜I.Net.TryGet!(°⊸Block1)
+    ⍣(⊙⊸°NetMessage.JoinReject
       &p "That game has already been joined!"
-      ⊸I~Net~End
+      ⊸I.Net.End
       &exit 1
     | )
-    ⊙NetMessage~JoinAccept!⟜↓(
+    ⊙NetMessage.JoinAccept!⟜↓(
       Board BoardSize
     | ∧◇Process ActionHistory
     | YourColor
     )
-    ˜∘˜GameMode~Online
+    ˜∘˜GameMode.Online
     &p "Connected"
   )
 )
 
-I~Open WinSize "Tak"
-I~Window!°FPS 30
+I.Open WinSize "Tak"
+I.Window!°FPS 30
 
 Game
 
-I~Loop!Game!(
-  I~Draw~Background Black
-  I~Draw~Background ⊸Texture
+I.Loop!Game!(
+  I.Draw.Background Black
+  I.Draw.Background ⊸Texture
 
   HandleKeyCamRotation
   HandleMouseCamRotation
@@ -413,7 +413,7 @@ I~Loop!Game!(
 
   HandleChatInteraction
 
-  I~Key~Pressed‼@e⍣(
+  I.Key.Pressed‼@e⍣(
     ⊸CheckChatUnfocused
     &p⊸ExportPTN
   | )
@@ -433,8 +433,8 @@ I~Loop!Game!(
   ⊸DrawPastMessage
 )
 
-&p⊸Game~ExportPTN
+&p⊸Game.ExportPTN
 
 ⟜↓(
-  I~Texture~Unload Game~Texture
-| ⍣(I~Net~End Game~GameMode≈Online~Tunnel|))
+  I.Texture.Unload Game.Texture
+| ⍣(I.Net.End Game.GameMode‥Online.Tunnel|))
