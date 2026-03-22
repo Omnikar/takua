@@ -32,8 +32,8 @@ Cap  ← 3
   # Check for a flat win/draw when the board is filled or one player runs out of pieces
   CheckFlatWin ← (
     ♭⊃(State|NFlats|NCaps)
-    ⍣(⤚⍣(
-        °0↧∩⌟₂(↥˜∩-∩/+⊃(∊Flat_Wall|=Cap)/◇⊂↥₀)⟜¯
+    ⍡(⤚⍩⍡(
+        ⍩°0↧∩⌟₂(↥˜∩-∩/+⊃(∊Flat_Wall|=Cap)/◇⊂↥₀)⟜¯
       | °1/×±≡◇⧻)
       ⊟⊃≤≥∩/+∩⌞=Flat⟜¯≡◇⬚0⊢
     )0_0
@@ -103,41 +103,41 @@ Cap  ← 3
       ⍜Amnts(⊂1)
     )
 
-    ⍣(◡⋅Orig °0_0
-      ∪⌞∘°⊸Dir ⍩°1⊸∊A₂⊸-
+    ⍡(◡⋅Orig⍩°0_0
+      ∪⌞∘°⊸Dir °1⊸∊A₂⊸-
       TryMove
     | ⊙(⊸-+×⧻◡⋅⊃(Amnts|Dir|Orig))
-      ⍣(TryMove◌°⟜∘|⋅⍜(⊢Amnts)+₁⋅°0_0))
+      ⍡(⍩TryMove◌⍩°⟜∘|⋅⍜(⊢Amnts)+₁⋅°0_0))
 
     °1≥/+⊸Move!⊃Amnts Num
   )
 
   ClickSquareImpl ↚ |3.2 (
-    ⍣( # If a move hasn't been started yet
-      °Uninit ˜∘
+    ⍡( # If a move hasn't been started yet
+      ⍩°Uninit ˜∘
       # Check if the square is occupied
       ⊡◡⊙Board.State
       # If empty, start a place
       # Otherwise, check that the active player
       # controls this square and start a move
-      ⍣(Move 1 0_0 [] ⍩°1±◇⊢|ClickSquareImpl⤙Place⋅0)
-    | SwitchPlacement
-    | PickUpPieces
-    | MovePieces
+      ⍩⍡(Move 1 0_0 [] °1±◇⍩⊢|ClickSquareImpl⤙Place⋅0)
+    | ⍩SwitchPlacement
+    | ⍩PickUpPieces
+    | ⍩MovePieces
     | # If nothing else works, restart the move and try again
       ⨬(ClickSquareImpl ⊙⋅Uninit)◌ ≍Uninit ⤙⊙∘
     )
 
     # Opponents place each other's flats on the first two turns
     <2◡⋅Board.Turn
-    ⍥⍣(°⊸Place.Piece¯1|⋅Uninit)
+    ⍥⍡(⍩°⊸Place.Piece¯1|⋅Uninit)
   )
 
   ClickSquare ← (
     # Change between positive representing player 1 and representing the active player
     FlipPlayer₂ ← (⌅(^0|^0))!(
       ◡⋅Board.ActivePlayer
-      ⍥⊓⍣⍜Place.Piece¯∘⍜Board.State¯
+      ⍥⊓⍡⍩⍜Place.Piece¯∘⍜Board.State¯
     )
 
     ⍜⊙FlipPlayer₂ ClickSquareImpl
@@ -146,16 +146,16 @@ Cap  ← 3
   # Format a move in Portable Tak Notation
   Fmt ← (
     FmtPos ← ⌅($"__"˜∩+@a1°⊟|⍜°⊟⊓(-@a|-₁⋕))
-    ⌅(⍣(""°Uninit
-      | ⌵°Place
-        ⊂⊓⍣(
-          ""°Flat
-        | "S"°Wall
-        | "C"°Cap
+    ⌅(⍡(""⍩°Uninit
+      | ⌵⍩°Place
+        ⊂⊓⍡(
+          ""⍩°Flat
+        | "S"⍩°Wall
+        | "C"⍩°Cap
         )FmtPos
-      | ⊙⤙⊙⊙◌°Move
-        /◇⊂{⊓(⍣(""°1)°⋕|FmtPos|˜⊏"+>-<"⨂A₂|⍣(""°1⧻|°⋕°⊥₁₀))})
-    | ⍣(↘₁⊢regex"([1-9]*)([a-h][1-8])([+>\\-<])([1-9]*).*?"
+      | ⊙⤙⊙⊙◌⍩°Move
+        /◇⊂{⊓(⍡(""⍩°1)°⋕|FmtPos|˜⊏"+>-<"⨂A₂|⍡(""⍩°1⧻|°⋕°⊥₁₀))})
+    | ⍡(↘₁⍩⊢regex"([1-9]*)([a-h][1-8])([+>\\-<])([1-9]*).*?"
         ⬚1⋕°□₄
         ⊃⊙⊓°FmtPos(˜⊡A₂⨂"+>-<")∪∪(⊥₁₀⬚∘⋕)
         Move⊙⤚⋅⊙∘
@@ -167,13 +167,13 @@ Cap  ← 3
   # Actions ? PTNString
   ParsePTN ← (
     # Strip metadata
-    ⍢∘⍣(1◌°$"[_]\n_")0
+    ⍢∘⍡(1◌⍩°$"[_]\n_")0
 
     ⊜□¬⊸∊" \n"
     ∩⌟▽⟜¬±◿₃°⊏
     ˜∘⍚°Fmt
     ≠⟜(↙⧻)◿₂⇡◡⋅⧻▽2=□"1."
-    ⍚⍥⍣⍜Place.Piece¯∘
+    ⍚⍥⍡⍩⍜Place.Piece¯∘
   )
 └─╴
 
@@ -196,12 +196,12 @@ Cap  ← 3
     ⍜Board.State⍚₀⍜(⌵↘₁|↧Flat)
   )
   # Assert that a move is completely formed
-  Validate ← °1⊸Action!⍣(0°Uninit|=/+Move!⊃Amnts Num|1)
+  Validate ← °1⊸Action!⍡(0⍩°Uninit|=/+⍩Move!⊃Amnts Num|1)
   Call ← (
     Validate
   
     # PTN OldState Board ? Action Board
-    ⊃⊓Action.Fmt Board.State⍣ProcessPlace ProcessMove
+    ⊃⊓Action.Fmt Board.State ⍡⍩ProcessPlace ProcessMove
   
     # Check if a wall was flattened, appending an asterisk to the PTN if so
     ◡⋅⊙Board.State

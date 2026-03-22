@@ -108,7 +108,7 @@ Message₂ ← I.Draw.Text White 30 100_140
     # If PastView is ∞, create a scene out of the present
     # Otherwise, make one out of the corresponding past state
     ⊸PastView
-    ⍣(⊸⊃Action Board °∞
+    ⍡(⊸⊃Action Board ⍩°∞
     | Action.New°⊸Board.State⊏⊙(⊸Board.History⊸Board))
   
     Scene‥IdxsAndBuild
@@ -138,19 +138,19 @@ Message₂ ← I.Draw.Text White 30 100_140
 
   # Rotate the camera based on mouse input
   # Game ? Game
-  HandleMouseCamRotation ← ⍣I.Mouse!Drag‼Left(
-    ⍥⊸(°1>10⌵)¬◡⋅Dragged
+  HandleMouseCamRotation ← ⍡I.Mouse!Drag‼Left(
+    ⍥⊸(⍩°1>10⌵)¬◡⋅Dragged
     ×DragSpeed⊟°ℂ
     ⍜⊣¯
     ⍜⊙CamPos(LimitCam+)
     RedrawScene
     °⊸Dragged1
-  )()
+  )∘
 
   # Switch the currently viewed past move based on keyboard input
   # Game ? Game
-  HandlePastViewing ← ⍣(
-    °1⊸⌵-∩I.Key.Pressed @- @=
+  HandlePastViewing ← ⍡(
+    ⍩°1⊸⌵-∩I.Key.Pressed @- @=
     ⊙(⊸⊃PastView Board‥Turn
       ⍥⋅⟜∘⊸=∞)
     I.Key!(∨∩Down LeftShift RightShift)
@@ -162,8 +162,8 @@ Message₂ ← I.Draw.Text White 30 100_140
 
   # Modify the currently active move based on mouse input
   # Game ? Game
-  HandleBoardClick ← ⍣I.Mouse!Released‼Left(
-    °0◡⋅Dragged
+  HandleBoardClick ← ⍡I.Mouse!Released‼Left(
+    ⍩°0◡⋅Dragged
     ⊙⊸ClickMap
     ⊸±⊡⌊×◡⋅△÷WinSize˜⊟°ℂ
     ⨬◌(
@@ -180,12 +180,12 @@ Message₂ ← I.Draw.Text White 30 100_140
   # Submit the currently active move based on player input,
   # sending a corresponding net message if in online mode
   # Game ? Game
-  HandleActionSubmission ← ⍣(
+  HandleActionSubmission ← ⍡(
     ⊸⊃Action Board
-    Process.Validate
+    ⍩Process.Validate
     I.Draw.Text White 40 -50_60 WinSize ">"
     I.Key!Pressed‼Space(
-      ⍣(◡⊙⋅GameMode‥Online.Tunnel
+      ⍡(◡⊙⋅⍩GameMode‥Online.Tunnel
         NetMessage.DoAction
         I.Net.Give
       | )
@@ -199,16 +199,16 @@ Message₂ ← I.Draw.Text White 30 100_140
   # ? Game
   DrawWinMessage ← (
     ⊸Board
-    Board!⍣(
-      ⟜(°1⊸/↥CheckRoadWin)
+    Board!⍡(
+      ⟜(⍩°1⊸/↥CheckRoadWin)
       # Bias for the player that was just active in case of a double road
       ⍜⊏(+0.1) ¬ActivePlayer
     | °1⊸/↥CheckFlatWin)
     # Don't draw the game end message if viewing a past move
-    ⍣(°1≠∞⋅Game.PastView
-    | Message₁ ⋅"Draw" °1_1
+    ⍡(⍩°1≠∞⋅Game.PastView
+    | Message₁ ⋅"Draw" ⍩°1_1
     | ⊢⍖
-      ⍣(=⊙GameMode‥Online.MyColor
+      ⍡(=⊙⍩GameMode‥Online.MyColor
         {"You lose!" "You win!"}
       | {"White wins!" "Black wins!"})
       Message₁ ˜⊏
@@ -219,7 +219,7 @@ Message₂ ← I.Draw.Text White 30 100_140
   # ? Game
   CheckActivePlayer ← (
     ⟜GameMode
-    ⍣⋅°GameMode.Local(
+    ⍡⋅⍩°GameMode.Local(
       ◌°⟜∘⊓Board‥ActivePlayer GameMode.Online.MyColor
     )
   )
@@ -236,12 +236,12 @@ Message₂ ← I.Draw.Text White 30 100_140
   # Game ? Game
   HandleMultiplayerWait ← (
     ⊸GameMode‥Online.Tunnel
-    I.Net.Get!⍣(
-      °NetMessage.DoAction
+    I.Net.Get!⍡(
+      ⍩°NetMessage.DoAction
       °⊸Action
       ⍜⊃Action Board(Action.New Process)
       RedrawScene RebuildScene
-    | °NetMessage.ChatMessage
+    | ⍩°NetMessage.ChatMessage
       ⍜Chat.Message.Sender¬
       ⍜⊙GameMode‥Online.Chat‥History⊂
     | °NetMessage.JoinRequest
@@ -254,17 +254,17 @@ Message₂ ← I.Draw.Text White 30 100_140
   # Error if in online mode and the chat is focused
   # Used to prevent keybinds from triggering upon chat typing
   # ? Game
-  CheckChatUnfocused ← °0⍣GameMode‥Online.Chat‥Focused 0
+  CheckChatUnfocused ← °0⍡⍩GameMode‥Online.Chat‥Focused 0
 
   # Handle client-side interaction with the in-game chat
   # Game ? Game
   HandleChatInteraction ← (
-    I.Mouse!Pressed‼Left⋅⍣(°⊸GameMode‥Online.Chat‥Focused0|)
+    I.Mouse!Pressed‼Left⋅⍡(⍩°⊸GameMode‥Online.Chat‥Focused0|)
   
-    ⍣(⊸GameMode‥Online.Chat
-      °1 ⊸Chat.Focused
+    ⍡(⊸⍩GameMode‥Online.Chat
+      ⍩°1 ⊸Chat.Focused
       I.Key.Pressed @\n
-      ⨬(⍜Chat.Draft (▽⊸≠ @\t I.Key.Input)
+      ⨬(⍜Chat.Draft(▽⊸≠ @\t I.Key.Input)
       | ⊸Chat.Draft
         ±⊸⧻
         ⨬◌(
@@ -278,11 +278,11 @@ Message₂ ← I.Draw.Text White 30 100_140
         °⊸Chat.Focused 0
       )
       °⊸GameMode‥Online.Chat
-    | I.Key.Pressed‼@\n(°⊸GameMode‥Online.Chat‥Focused 1)
+    | I.Key.Pressed‼@\n(⍩°⊸GameMode‥Online.Chat‥Focused 1)
     | )
   
-    ⍣(I.Key.Pressed‼@\t⍜GameMode‥Online.Chat‥Focused¬
-      ⊸GameMode‥Online.Chat‥Draw
+    ⍡(I.Key.Pressed‼@\t⍩⍜GameMode‥Online.Chat‥Focused¬
+      ⊸⍩GameMode‥Online.Chat‥Draw
     | )
   )
 
@@ -291,7 +291,7 @@ Message₂ ← I.Draw.Text White 30 100_140
   # ? Game
   DrawPieceCounters ← (
     ⊃Board PastView
-    Board!⊃(⍣(˜⊏History|State)|NFlats|NCaps)
+    Board!⊃(⍡(⍩˜⊏History|State)|NFlats|NCaps)
     ⟜¯
     ∩⌟₂(
       /◇⊂♭ ↥₀
@@ -339,20 +339,20 @@ Message₂ ← I.Draw.Text White 30 100_140
 # BoardSize ?
 QueryBoardSize ← (
   &pf "Enter board size (5): "
-  ⍣(∩°1⊸⊃≥₃≤₈⋕)5 &sc
+  ⍡(∩⍩°1⊸⊃≥₃≤₈⍩⋕)5 &sc
 )
 
 # MyColor ?
 QueryMyColor ← (
   &pf "Player [1] or player [2] (random)? "
-  ⍣(-₁°1⊸∊1_2⋕|⁅⚂) &sc
+  ⍡(-₁⍩°1⊸∊1_2⍩⋕|⁅⚂) &sc
 )
 
 # ActionHistory ?
-LoadPTN ← (memo⍣(
-  °□⊏1&args
-  ⍣(&rs ∞ 0 &p"Enter PTN:" °"--stdin")&fras
-  Action.ParsePTN
+LoadPTN ← (memo⍡(
+  °□⍩⊏1&args
+  ⍩⍡(⍩&rs ∞ 0 &p"Enter PTN:" ⍩°"--stdin")&fras
+  ⍩Action.ParsePTN
   ){})
 
 ⍢◌(&pf "[l]ocal or [o]nline? "
@@ -382,7 +382,7 @@ LoadPTN ← (memo⍣(
     ⊸I.Net.Give
     &p "Connecting..."
     ⟜I.Net.TryGet!(°⊸Block1)
-    ⍣(⊙⊸°NetMessage.JoinReject
+    ⍡(⊙⊸⍩°NetMessage.JoinReject
       &p "That game has already been joined!"
       ⊸I.Net.End
       &exit 1
@@ -413,20 +413,20 @@ I.Loop!Game!(
 
   HandleChatInteraction
 
-  I.Key.Pressed‼@e⍣(
-    ⊸CheckChatUnfocused
+  I.Key.Pressed‼@e⍡(
+    ⊸⍩CheckChatUnfocused
     &p⊸ExportPTN
   | )
 
-  ⍣(⊸DrawWinMessage
-  | ⍣(⊸CheckActivePlayer
+  ⍡(⊸⍩DrawWinMessage
+  | ⍡(⊸⍩CheckActivePlayer
       ⊸DrawBeginningMessage
     | Message₁ "Waiting for opponent...")
-    ⊸CheckChatUnfocused
+    ⊸⍩CheckChatUnfocused
     HandleActivePlayer
   | )
 
-  ⍣(HandleMultiplayerWait|)
+  ⍡⍩HandleMultiplayerWait∘
 
   ⊸DrawPieceCounters
 
@@ -437,4 +437,4 @@ I.Loop!Game!(
 
 ⟜↓(
   I.Texture.Unload Game.Texture
-| ⍣(I.Net.End Game.GameMode‥Online.Tunnel|))
+| ⍡(I.Net.End ⍩Game.GameMode‥Online.Tunnel|))
